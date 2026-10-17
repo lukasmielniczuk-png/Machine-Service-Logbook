@@ -1,0 +1,1254 @@
+<!--
+=====================================================================
+Garażowy Dziennik Serwisowy v1.0 (PWA Multilanguage, PDF & Chart.js)
+Autor / Twórca: L. Mielniczuk
+Data utworzenia: 2026
+Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
+=====================================================================
+-->
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garażowy Dziennik Serwisowy</title>
+    
+    <!-- PWA / KONFIGURACJA DLA SMARTFONA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f59e0b">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/svgs/solid/wrench.svg">
+
+    <!-- ZEWNĘTRZNE BIBLIOTEKI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+        input, textarea, select {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
+
+        /* REGULACJA DRUKU / GENEROWANIA PDF */
+        @media print {
+            header button, 
+            header input,
+            header select,
+            #vehicleTabs, 
+            #bgOverlay, 
+            footer, 
+            .lg\:col-span-1, 
+            #searchInput, 
+            #yearFilter, 
+            #clearSearchBtn,
+            button,
+            .fa-xmark {
+                display: none !important;
+            }
+
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                padding: 0 !important;
+            }
+
+            .max-w-5xl {
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+            }
+
+            .lg\:col-span-2 {
+                width: 100% !important;
+            }
+
+            .bg-slate-800\/90, .bg-slate-900\/80, .bg-slate-900 {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+
+            h1, h2, h3, p, span, div {
+                color: #0f172a !important;
+            }
+
+            .border-l-2 {
+                border-left-color: #94a3b8 !important;
+            }
+
+            .border-slate-700\/70 {
+                border: 1px solid #cbd5e1 !important;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body id="appBody" class="bg-slate-900 text-slate-100 min-h-screen font-sans p-4 md:p-8 transition-all duration-300" oncontextmenu="return false;" ondragstart="return false;">
+
+    <!-- Ciemna nakładka -->
+    <div id="bgOverlay" class="fixed inset-0 bg-slate-900/90 -z-10 transition-all duration-300 pointer-events-none"></div>
+
+    <div class="max-w-5xl mx-auto flex flex-col min-h-[90vh] justify-between relative z-10">
+        <div>
+            <!-- HEADER -->
+            <header class="flex flex-col md:flex-row justify-between items-center mb-8 border-b border-slate-700/80 pb-4 gap-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-amber-500 flex items-center gap-3">
+                        <i class="fa-solid fa-wrench"></i> <span data-i18n="appTitle">Dziennik Serwisowy Maszyn</span>
+                    </h1>
+                    <p class="text-slate-400 text-sm mt-1" data-i18n="appSub">Historia serwisu, wymian płynów i usterek w jednym miejscu</p>
+                </div>
+                <div class="flex gap-2 flex-wrap justify-end items-center">
+                    <!-- SELEKTOR JĘZYKA (8 JĘZYKÓW) -->
+                    <div class="flex items-center bg-slate-800 rounded-lg border border-slate-700 px-2.5 py-1 gap-1.5 text-xs">
+                        <i class="fa-solid fa-globe text-amber-400"></i>
+                        <select id="langSelect" onchange="setLanguage(this.value)" class="bg-slate-800 text-amber-400 font-bold focus:outline-none cursor-pointer">
+                            <option value="pl">🇵🇱 PL</option>
+                            <option value="en">🇬🇧 EN</option>
+                            <option value="de">🇩🇪 DE</option>
+                            <option value="zh">🇨🇳 中文</option>
+                            <option value="ja">🇯🇵 日本語</option>
+                            <option value="fil">🇵🇭 FIL</option>
+                            <option value="id">🇮🇩 ID</option>
+                            <option value="ru">🇷🇺 RU</option>
+                        </select>
+                    </div>
+
+                    <!-- PRZYCISK INSTALACJI PWA -->
+                    <button id="installAppBtn" onclick="installPWA()" title="Zainstaluj aplikację" class="hidden bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3 py-2 rounded-lg transition flex items-center gap-1.5 text-sm animate-pulse">
+                        <i class="fa-solid fa-download"></i> <span data-i18n="btnInstall">Zainstaluj</span>
+                    </button>
+
+                    <!-- ZMIANA TŁA -->
+                    <input type="file" id="bgInput" accept="image/*" onchange="handleBgUpload(event)" class="hidden">
+                    <button onclick="document.getElementById('bgInput').click()" title="Zmień tło" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1.5 text-sm">
+                        <i class="fa-solid fa-image"></i> <span data-i18n="btnBg">Tło</span>
+                    </button>
+                    <button id="resetBgBtn" onclick="resetBg()" title="Usuń własne tło" class="hidden bg-slate-800 hover:bg-red-900/50 text-red-400 font-bold px-2.5 py-2 rounded-lg border border-slate-700 transition flex items-center text-sm">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+
+                    <!-- DRUK / PDF -->
+                    <button onclick="window.print()" title="Drukuj / Zapisz do PDF" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1.5 text-sm">
+                        <i class="fa-solid fa-print"></i> <span data-i18n="btnPrint">PDF / Druk</span>
+                    </button>
+
+                    <!-- IMPORT / EKSPORT -->
+                    <input type="file" id="importFile" accept=".json" onchange="importData(event)" class="hidden">
+                    
+                    <button onclick="document.getElementById('importFile').click()" title="Importuj dane" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1.5 text-sm">
+                        <i class="fa-solid fa-upload"></i> <span data-i18n="btnImport">Importuj</span>
+                    </button>
+                    <button onclick="exportData()" title="Eksportuj dane" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-3 py-2 rounded-lg border border-slate-700 transition flex items-center gap-1.5 text-sm">
+                        <i class="fa-solid fa-download"></i> <span data-i18n="btnExport">Eksportuj</span>
+                    </button>
+                    <button onclick="openVehicleModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-lg transition flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-plus"></i> <span data-i18n="btnAddVehicle">Dodaj Maszynę</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- MASZYNY (TABS) -->
+            <div id="vehicleTabs" class="flex gap-2 overflow-x-auto pb-4 mb-6"></div>
+
+            <!-- MAIN CONTENT -->
+            <div id="mainContent" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- KARTA MASZYNY -->
+                    <div class="bg-slate-800/90 backdrop-blur border border-slate-700 rounded-xl p-5 shadow-lg space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h2 id="currentVehicleName" class="text-2xl font-bold text-slate-100">---</h2>
+                                <p id="currentVehicleType" class="text-xs font-semibold px-2.5 py-0.5 rounded bg-amber-500/10 text-amber-400 w-fit mt-1">---</p>
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="deleteCurrentVehicle()" title="Usuń maszynę" class="text-slate-500 hover:text-red-400 p-1.5 transition">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                                <button onclick="openLogModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 py-1.5 rounded text-sm flex items-center gap-2 transition ml-1">
+                                    <i class="fa-solid fa-plus"></i> <span data-i18n="btnAddLog">Wpis</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- LICZNIK -->
+                        <div class="bg-slate-900/80 p-3 rounded-lg border border-slate-700 flex justify-between items-center">
+                            <div class="flex items-center gap-2 text-slate-300 text-xs font-medium">
+                                <i class="fa-solid fa-gauge-high text-amber-400"></i>
+                                <span data-i18n="lblMileage">Stan licznika:</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <input type="text" id="currentMileageInput" onchange="updateVehicleMileage(event)" placeholder="np. 260 000" class="w-28 bg-slate-800 border border-slate-600 rounded px-2 py-1 text-right text-xs font-mono font-bold text-amber-400 focus:outline-none focus:border-amber-500">
+                                <span class="text-xs text-slate-400 font-mono">km</span>
+                            </div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center pt-2">
+                            <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider" data-i18n="lblStatusHeader">Sygnalizator Płynów</h3>
+                            <button id="clearFilterBtn" onclick="setCategoryFilter(null)" class="text-xs text-amber-400 hover:text-amber-300 hidden transition underline" data-i18n="btnShowAll">
+                                Pokaż wszystkie
+                            </button>
+                        </div>
+
+                        <div id="statusList" class="space-y-2"></div>
+                    </div>
+
+                    <!-- KARTA PODSUMOWANIA WYDATKÓW -->
+                    <div class="bg-slate-800/90 backdrop-blur border border-slate-700 rounded-xl p-5 shadow-lg space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-coins text-emerald-400"></i> <span data-i18n="lblExpenses">Wydatki Serwisowe</span>
+                            </h3>
+                            <span id="costFilterLabel" class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Łącznie</span>
+                        </div>
+                        <div class="bg-slate-900/90 p-3.5 rounded-lg border border-slate-700/80 flex justify-between items-center">
+                            <span class="text-xs text-slate-400" data-i18n="lblTotal">Suma PLN:</span>
+                            <span id="totalCostDisplay" class="text-xl font-bold font-mono text-emerald-400">0 zł</span>
+                        </div>
+                    </div>
+
+                    <!-- KARTA WYKRESU WYDATKÓW -->
+                    <div class="bg-slate-800/90 backdrop-blur border border-slate-700 rounded-xl p-5 shadow-lg space-y-3">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-sm font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                                <i class="fa-solid fa-chart-column text-amber-400"></i>
+                                <span data-i18n="lblChartTitle">Wykres Wydatków</span>
+                            </h3>
+                        </div>
+                        <div class="relative w-full h-48">
+                            <canvas id="expensesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HISTORIA -->
+                <div class="lg:col-span-2">
+                    <div class="bg-slate-800/90 backdrop-blur border border-slate-700 rounded-xl p-5 shadow-lg space-y-4">
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <div class="sm:col-span-2 relative">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-sm"></i>
+                                <input type="text" id="searchInput" oninput="handleSearch(event)" placeholder="Szukaj w historii..." class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-10 pr-10 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition">
+                                <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-2.5 text-slate-400 hover:text-slate-200 text-sm">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            
+                            <div>
+                                <select id="yearFilter" onchange="handleYearChange(event)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500 transition">
+                                    <option value="">Wszystkie lata</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h3 id="timelineHeader" class="text-xl font-bold text-slate-100 pt-2 flex items-center gap-2">
+                            <i class="fa-solid fa-clock-rotate-left text-amber-500"></i> <span data-i18n="lblTimeline">Chronologiczna Historia Serwisu</span>
+                        </h3>
+                        
+                        <div id="timelineList" class="relative border-l-2 border-slate-700 ml-4 space-y-6 pt-2"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STOPKA -->
+        <footer class="mt-12 text-center border-t border-slate-800/80 pt-6 pb-4">
+            <p class="text-xs text-slate-500 font-mono">
+                &copy; 2026 Garażowy Dziennik Serwisowy &bull; Autor: <span class="text-amber-500/90 font-bold">L. Mielniczuk</span> &bull; <span data-i18n="lblRights">Wszelkie prawa zastrzeżone</span>
+            </p>
+        </footer>
+    </div>
+
+    <!-- MODAL: DODAJ MASZYNĘ -->
+    <div id="vehicleModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-md w-full">
+            <h3 class="text-xl font-bold text-amber-500 mb-4" data-i18n="modalAddVehicleTitle">Dodaj Nową Maszynę</h3>
+            <form id="vehicleForm" onsubmit="saveVehicle(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1" data-i18n="lblVehicleName">Nazwa / Model</label>
+                    <input type="text" id="vName" placeholder="np. Passat B6, Honda VT125" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100 focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1" data-i18n="lblVehicleType">Typ Pojazdu / Sprzętu</label>
+                    <select id="vType" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100 focus:outline-none focus:border-amber-500">
+                        <option value="Samochód" data-i18n="optCar">Samochód</option>
+                        <option value="Motocykl" data-i18n="optBike">Motocykl</option>
+                        <option value="Kosiarka / Sprzęt Ogrodowy" data-i18n="optGarden">Kosiarka / Sprzęt Ogrodowy</option>
+                        <option value="Inny" data-i18n="optOther">Inny</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 pt-4">
+                    <button type="button" onclick="closeVehicleModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded" data-i18n="btnCancel">Anuluj</button>
+                    <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded" data-i18n="btnSave">Zapisz</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: DODAJ WPIS -->
+    <div id="logModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+        <div class="bg-slate-800 border border-slate-700 rounded-xl p-6 max-w-lg w-full">
+            <h3 class="text-xl font-bold text-emerald-400 mb-4" data-i18n="modalAddLogTitle">Dodaj Wpis do Historii</h3>
+            <form id="logForm" onsubmit="saveLog(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1" data-i18n="lblDate">Data</label>
+                        <input type="date" id="lDate" required class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1" data-i18n="lblCategory">Kategoria</label>
+                        <select id="lCategory" onchange="toggleCheckboxes()" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+                            <option value="Olej Silnikowy" data-i18n="catEngineOil">Olej Silnikowy</option>
+                            <option value="Olej Skrzyni Biegów" data-i18n="catGearboxOil">Olej Skrzyni Biegów</option>
+                            <option value="Pasek Rozrządu" data-i18n="catTimingBelt">Pasek Rozrządu</option>
+                            <option value="Pasek Pomocniczy" data-i18n="catAuxBelt">Pasek Pomocniczy</option>
+                            <option value="Płyn Hamulcowy" data-i18n="catBrakeFluid">Płyn Hamulcowy</option>
+                            <option value="Płyn Chłodniczy" data-i18n="catCoolant">Płyn Chłodniczy</option>
+                            <option value="Płyn Wspomagania" data-i18n="catPowerSteering">Płyn Wspomagania Kierownicy</option>
+                            <option value="Świece Zapłonowe / Żarowe" data-i18n="catSparkPlugs">Świece Zapłonowe / Żarowe</option>
+                            <option value="Filtry" data-i18n="catFilters">Filtry (Powietrza / Kabinowy)</option>
+                            <option value="Serwis Klimatyzacji" data-i18n="catAC">Serwis Klimatyzacji</option>
+                            <option value="Naprawa / Usterka" data-i18n="catRepair">Naprawa / Usterka</option>
+                            <option value="Inne" data-i18n="catOther">Inne</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- CHECKBOXY -->
+                <div id="checkboxContainer" class="bg-slate-900/50 p-3 rounded-lg border border-slate-700 space-y-2">
+                    <div id="chkOilFilter" class="flex items-center gap-2">
+                        <input type="checkbox" id="cOilFilter" class="w-4 h-4 accent-emerald-500 rounded">
+                        <label for="cOilFilter" class="text-sm text-slate-300 cursor-pointer" data-i18n="chkOilFilter">Wymieniono filtr oleju</label>
+                    </div>
+
+                    <div id="chkTimingBelt" class="hidden flex-col gap-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                            <input type="checkbox" id="cTBTensioner" class="w-4 h-4 accent-emerald-500 rounded">
+                            <span data-i18n="chkTensioner">Wymieniono napinacz</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                            <input type="checkbox" id="cTBPulley" class="w-4 h-4 accent-emerald-500 rounded">
+                            <span data-i18n="chkPulleys">Wymieniono rolki</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                            <input type="checkbox" id="cTBWaterPump" class="w-4 h-4 accent-emerald-500 rounded">
+                            <span data-i18n="chkWaterPump">Wymieniono pompę wody</span>
+                        </label>
+                    </div>
+
+                    <div id="chkACDryer" class="hidden flex-col gap-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                            <input type="checkbox" id="cACDryer" class="w-4 h-4 accent-emerald-500 rounded">
+                            <span data-i18n="chkACDryer">Wymieniono osuszacz klimatyzacji</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                            <input type="checkbox" id="cACGas" class="w-4 h-4 accent-emerald-500 rounded">
+                            <span data-i18n="chkACGas">Uzupełniono/napełniono czynnik AC</span>
+                        </label>
+                    </div>
+
+                    <div id="chkFilters" class="hidden flex-col gap-2">
+                        <label class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                            <input type="checkbox" id="cAirFilter" class="w-4 h-4 accent-emerald-500 rounded">
+                            <span data-i18n="chkAirFilter">Wymieniono filtr powietrza</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                            <input type="checkbox" id="cCabinFilter" class="w-4 h-4 accent-emerald-500 rounded">
+                            <span data-i18n="chkCabinFilter">Wymieniono filtr kabinowy</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1" data-i18n="lblLogMileage">Przebieg (opcjonalnie)</label>
+                        <input type="text" id="lMileage" placeholder="np. 185 000 km" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1" data-i18n="lblCost">Koszt w PLN (opcjonalnie)</label>
+                        <input type="number" step="0.01" id="lCost" placeholder="np. 450" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100 focus:outline-none focus:border-emerald-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-1" data-i18n="lblDesc">Opis / Części / Uwagi</label>
+                    <textarea id="lDesc" rows="3" placeholder="np. Komplet Continental / INA..." class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100 focus:outline-none focus:border-emerald-500"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 pt-4">
+                    <button type="button" onclick="closeLogModal()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded" data-i18n="btnCancel">Anuluj</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded" data-i18n="btnAddLog">Dodaj Wpis</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // SŁOWNIK WIELOJĘZYCZNY (8 JĘZYKÓW)
+        const i18n = {
+            pl: {
+                appTitle: "Dziennik Serwisowy Maszyn", appSub: "Historia serwisu, wymian płynów i usterek w jednym miejscu",
+                btnBg: "Tło", btnPrint: "PDF / Druk", btnInstall: "Zainstaluj", btnImport: "Importuj", btnExport: "Eksportuj", btnAddVehicle: "Dodaj Maszynę", btnAddLog: "Wpis",
+                lblMileage: "Stan licznika:", lblStatusHeader: "Sygnalizator Płynów", btnShowAll: "Pokaż wszystkie", lblExpenses: "Wydatki Serwisowe", lblTotal: "Suma PLN:",
+                lblChartTitle: "Wykres Wydatków", lblTimeline: "Chronologiczna Historia Serwisu", searchPlaceholder: "Szukaj w historii...", allYears: "Wszystkie lata", noData: "Brak danych", lblRights: "Wszelkie prawa zastrzeżone",
+                modalAddVehicleTitle: "Dodaj Nową Maszynę", lblVehicleName: "Nazwa / Model", lblVehicleType: "Typ Pojazdu / Sprzętu",
+                optCar: "Samochód", optBike: "Motocykl", optGarden: "Kosiarka / Sprzęt Ogrodowy", optOther: "Inny", btnCancel: "Anuluj", btnSave: "Zapisz",
+                modalAddLogTitle: "Dodaj Wpis do Historii", lblDate: "Data", lblCategory: "Kategoria",
+                catEngineOil: "Olej Silnikowy", catGearboxOil: "Olej Skrzyni Biegów", catTimingBelt: "Pasek Rozrządu", catAuxBelt: "Pasek Pomocniczy",
+                catBrakeFluid: "Płyn Hamulcowy", catCoolant: "Płyn Chłodniczy", catPowerSteering: "Płyn Wspomagania Kierownicy", catSparkPlugs: "Świece Zapłonowe / Żarowe",
+                catFilters: "Filtry (Powietrza / Kabinowy)", catAC: "Serwis Klimatyzacji", catRepair: "Naprawa / Usterka", catOther: "Inne",
+                chkOilFilter: "Wymieniono filtr oleju", chkTensioner: "Wymieniono napinacz", chkPulleys: "Wymieniono rolki", chkWaterPump: "Wymieniono pompę wody",
+                chkACDryer: "Wymieniono osuszacz klimatyzacji", chkACGas: "Uzupełniono/napełniono czynnik AC", chkAirFilter: "Wymieniono filtr powietrza", chkCabinFilter: "Wymieniono filtr kabinowy",
+                lblLogMileage: "Przebieg (opcjonalnie)", lblCost: "Koszt w PLN (opcjonalnie)", lblDesc: "Opis / Części / Uwagi"
+            },
+            en: {
+                appTitle: "Machine Service Logbook", appSub: "Service history, fluid changes, and repair log in one place",
+                btnBg: "Wallpaper", btnPrint: "PDF / Print", btnInstall: "Install", btnImport: "Import", btnExport: "Export", btnAddVehicle: "Add Machine", btnAddLog: "Entry",
+                lblMileage: "Odometer:", lblStatusHeader: "Fluid Status Indicator", btnShowAll: "Show all", lblExpenses: "Service Expenses", lblTotal: "Total PLN:",
+                lblChartTitle: "Expenses Chart", lblTimeline: "Chronological Service History", searchPlaceholder: "Search history...", allYears: "All years", noData: "No data", lblRights: "All rights reserved",
+                modalAddVehicleTitle: "Add New Machine", lblVehicleName: "Name / Model", lblVehicleType: "Vehicle / Equipment Type",
+                optCar: "Car", optBike: "Motorcycle", optGarden: "Lawnmower / Garden Tool", optOther: "Other", btnCancel: "Cancel", btnSave: "Save",
+                modalAddLogTitle: "Add History Entry", lblDate: "Date", lblCategory: "Category",
+                catEngineOil: "Engine Oil", catGearboxOil: "Gearbox Oil", catTimingBelt: "Timing Belt", catAuxBelt: "Auxiliary Belt",
+                catBrakeFluid: "Brake Fluid", catCoolant: "Coolant", catPowerSteering: "Power Steering Fluid", catSparkPlugs: "Spark / Glow Plugs",
+                catFilters: "Filters (Air / Cabin)", catAC: "A/C Service", catRepair: "Repair / Fault", catOther: "Other",
+                chkOilFilter: "Replaced oil filter", chkTensioner: "Replaced tensioner", chkPulleys: "Replaced pulleys", chkWaterPump: "Replaced water pump",
+                chkACDryer: "Replaced A/C receiver dryer", chkACGas: "Refilled A/C refrigerant", chkAirFilter: "Replaced air filter", chkCabinFilter: "Replaced cabin filter",
+                lblLogMileage: "Mileage (optional)", lblCost: "Cost in PLN (optional)", lblDesc: "Description / Parts / Notes"
+            },
+            de: {
+                appTitle: "Maschinen-Serviceheft", appSub: "Wartungshistorie, Flüssigkeitswechsel und Reparaturen an einem Ort",
+                btnBg: "Hintergrund", btnPrint: "PDF / Drucken", btnInstall: "Installieren", btnImport: "Importieren", btnExport: "Exportieren", btnAddVehicle: "Maschine hinzufügen", btnAddLog: "Eintrag",
+                lblMileage: "Kilometerstand:", lblStatusHeader: "Flüssigkeits-Anzeige", btnShowAll: "Alle anzeigen", lblExpenses: "Wartungskosten", lblTotal: "Gesamt PLN:",
+                lblChartTitle: "Ausgaben-Diagramm", lblTimeline: "Chronologische Servicehistorie", searchPlaceholder: "In der Historie suchen...", allYears: "Alle Jahre", noData: "Keine Daten", lblRights: "Alle Rechte vorbehalten",
+                modalAddVehicleTitle: "Neue Maschine hinzufügen", lblVehicleName: "Name / Modell", lblVehicleType: "Fahrzeug- / Gerätetyp",
+                optCar: "Auto", optBike: "Motorrad", optGarden: "Rasenmäher / Gartengerät", optOther: "Sonstiges", btnCancel: "Abbrechen", btnSave: "Speichern",
+                modalAddLogTitle: "Eintrag hinzufügen", lblDate: "Datum", lblCategory: "Kategorie",
+                catEngineOil: "Motoröl", catGearboxOil: "Getriebeöl", catTimingBelt: "Zahnriemen", catAuxBelt: "Keilriemen",
+                catBrakeFluid: "Bremsflüssigkeit", catCoolant: "Kühlflüssigkeit", catPowerSteering: "Servoflüssigkeit", catSparkPlugs: "Zünd- / Glühkerzen",
+                catFilters: "Filter (Luft / Innenraum)", catAC: "Klimaservice", catRepair: "Reparatur / Defekt", catOther: "Sonstiges",
+                chkOilFilter: "Ölfilter gewechselt", chkTensioner: "Spannrolle gewechselt", chkPulleys: "Umlenkrollen gewechselt", chkWaterPump: "Wasserpumpe gewechselt",
+                chkACDryer: "Trockner gewechselt", chkACGas: "Kältemittel aufgefüllt", chkAirFilter: "Luftfilter gewechselt", chkCabinFilter: "Innenraumfilter gewechselt",
+                lblLogMileage: "Kilometerstand (optional)", lblCost: "Kosten in PLN (optional)", lblDesc: "Beschreibung / Teile / Notizen"
+            },
+            zh: {
+                appTitle: "机械服务日志", appSub: "服务记录、液体更换和故障维修集中管理",
+                btnBg: "背景壁纸", btnPrint: "PDF / 打印", btnInstall: "安装应用", btnImport: "导入", btnExport: "导出", btnAddVehicle: "添加机械", btnAddLog: "添加记录",
+                lblMileage: "里程表：", lblStatusHeader: "油液状态提示", btnShowAll: "显示全部", lblExpenses: "维修费用", lblTotal: "总计 PLN：",
+                lblChartTitle: "开支图表", lblTimeline: "按时间顺序的服务历史", searchPlaceholder: "搜索历史...", allYears: "所有年份", noData: "无数据", lblRights: "保留所有权利",
+                modalAddVehicleTitle: "添加新机械", lblVehicleName: "名称 / 型号", lblVehicleType: "车辆 / 设备类型",
+                optCar: "汽车", optBike: "摩托车", optGarden: "割草机 / 园艺设备", optOther: "其他", btnCancel: "取消", btnSave: "保存",
+                modalAddLogTitle: "添加历史记录", lblDate: "日期", lblCategory: "类别",
+                catEngineOil: "机油", catGearboxOil: "变速箱油", catTimingBelt: "正时皮带", catAuxBelt: "发电机/附件皮带",
+                catBrakeFluid: "刹车油", catCoolant: "防冻液/冷却液", catPowerSteering: "转向助力油", catSparkPlugs: "火花塞 / 预热塞",
+                catFilters: "滤清器（空气/空调）", catAC: "空调保养", catRepair: "维修 / 故障", catOther: "其他",
+                chkOilFilter: "已更换机滤", chkTensioner: "已更换涨紧轮", chkPulleys: "已更换惰轮", chkWaterPump: "已更换水泵",
+                chkACDryer: "已更换空调干燥罐", chkACGas: "已加注空调雪种", chkAirFilter: "已更换空滤", chkCabinFilter: "已更换空调滤",
+                lblLogMileage: "里程（可选）", lblCost: "费用（PLN，可选）", lblDesc: "说明 / 零部件 / 备注"
+            },
+            ja: {
+                appTitle: "マシン整備記録簿", appSub: "整備履歴、油脂類交換、故障修理を一元管理",
+                btnBg: "壁紙", btnPrint: "PDF / 印刷", btnInstall: "インストール", btnImport: "インポート", btnExport: "エクスポート", btnAddVehicle: "車両を追加", btnAddLog: "記録を追加",
+                lblMileage: "走行量 / 稼働時間：", lblStatusHeader: "油脂類ステータス", btnShowAll: "すべて表示", lblExpenses: "整備費用", lblTotal: "合計 PLN：",
+                lblChartTitle: "支出チャート", lblTimeline: "時系列整備履歴", searchPlaceholder: "履歴を検索...", allYears: "すべての年", noData: "データなし", lblRights: "All rights reserved",
+                modalAddVehicleTitle: "新しい車両・機器を追加", lblVehicleName: "名称 / モデル", lblVehicleType: "タイプ",
+                optCar: "乗用車", optBike: "オートバイ", optGarden: "芝刈り機 / 園芸機器", optOther: "その他", btnCancel: "キャンセル", btnSave: "保存",
+                modalAddLogTitle: "整備記録を追加", lblDate: "日付", lblCategory: "カテゴリー",
+                catEngineOil: "エンジンオイル", catGearboxOil: "ミッションオイル", catTimingBelt: "タイミングベルト", catAuxBelt: "ファン/Vベルト",
+                catBrakeFluid: "ブレーキフルード", catCoolant: "冷却水（LLC）", catPowerSteering: "パワステフルード", catSparkPlugs: "スパーク/グロープラグ",
+                catFilters: "フィルター類（エア/エアコン）", catAC: "エアコン整備", catRepair: "修理 / 故障", catOther: "その他",
+                chkOilFilter: "オイルフィルター交換済", chkTensioner: "テンショナー交換済", chkPulleys: "プーリー交換済", chkWaterPump: "ウォーターポンプ交換済",
+                chkACDryer: "リキッドタンク交換済", chkACGas: "エアコンガス補充済", chkAirFilter: "エアフィルター交換済", chkCabinFilter: "エアコンフィルター交換済",
+                lblLogMileage: "走行距離（任意）", lblCost: "費用 PLN（任意）", lblDesc: "内容 / 使用パーツ / 備考"
+            },
+            fil: {
+                appTitle: "Serbisyo Talaan ng Makina", appSub: "Kasaysayan ng serbisyo, pagpapalit ng langis at sira sa isang lugar",
+                btnBg: "Wallpaper", btnPrint: "PDF / I-print", btnInstall: "I-install", btnImport: "Angkat", btnExport: "Ilabas", btnAddVehicle: "Magdagdag ng Makina", btnAddLog: "Tala",
+                lblMileage: "Odometer:", lblStatusHeader: "Tagapagpahiwatig ng Langis", btnShowAll: "Ipakita lahat", lblExpenses: "Gastos sa Serbisyo", lblTotal: "Kabuuan PLN:",
+                lblChartTitle: "Talahanayan ng Gastos", lblTimeline: "Kasaysayan ng Serbisyo", searchPlaceholder: "Magsaliksik sa kasaysayan...", allYears: "Lahat ng taon", noData: "Walang datos", lblRights: "Rizervado ang lahat ng karapatan",
+                modalAddVehicleTitle: "Magdagdag ng Bagong Makina", lblVehicleName: "Pangalan / Modelo", lblVehicleType: "Uri ng Sasakyan / Kagamitan",
+                optCar: "Kotse", optBike: "Motorsiklo", optGarden: "Pang-gupit ng Damo / Halaman", optOther: "Iba pa", btnCancel: "Kanselahin", btnSave: "I-save",
+                modalAddLogTitle: "Magdagdag ng Tala sa Kasaysayan", lblDate: "Petsa", lblCategory: "Kategorya",
+                catEngineOil: "Langis ng Makina", catGearboxOil: "Langis ng Transmisyon", catTimingBelt: "Timing Belt", catAuxBelt: "Auxiliary Belt",
+                catBrakeFluid: "Tubig sa Preno", catCoolant: "Palamig / Coolant", catPowerSteering: "Langis sa Power Steering", catSparkPlugs: "Spark / Glow Plugs",
+                catFilters: "Mga Filter (Hangin / Kabina)", catAC: "Serbisyo sa Aircon", catRepair: "Kumpuni / Sira", catOther: "Iba pa",
+                chkOilFilter: "Pinalitan ang filter ng langis", chkTensioner: "Pinalitan ang tensioner", chkPulleys: "Pinalitan ang ikutan", chkWaterPump: "Pinalitan ang bomba ng tubig",
+                chkACDryer: "Pinalitan ang dryer ng aircon", chkACGas: "Pinalagyan ng freon", chkAirFilter: "Pinalitan ang filter ng hangin", chkCabinFilter: "Pinalitan ang filter sa kabina",
+                lblLogMileage: "Komersyal / Kilometro (psyonal)", lblCost: "Halaga sa PLN (psyonal)", lblDesc: "Paglalarawan / Bahagi / Puna"
+            },
+            id: {
+                appTitle: "Buku Servis Mesin", appSub: "Riwayat servis, pergantian oli, dan perbaikan dalam satu tempat",
+                btnBg: "Wallpaper", btnPrint: "PDF / Cetak", btnInstall: "Instal", btnImport: "Impor", btnExport: "Ekspor", btnAddVehicle: "Tambah Mesin", btnAddLog: "Catatan",
+                lblMileage: "Odometer:", lblStatusHeader: "Indikator Cairan", btnShowAll: "Tampilkan semua", lblExpenses: "Biaya Servis", lblTotal: "Total PLN:",
+                lblChartTitle: "Grafik Pengeluaran", lblTimeline: "Riwayat Servis Kronologis", searchPlaceholder: "Cari dalam riwayat...", allYears: "Semua tahun", noData: "Tidak ada data", lblRights: "Hak cipta dilindungi undang-undang",
+                modalAddVehicleTitle: "Tambah Mesin Baru", lblVehicleName: "Nama / Model", lblVehicleType: "Jenis Kendaraan / Peralatan",
+                optCar: "Mobil", optBike: "Sepeda Motor", optGarden: "Mesin Rumput / Alat Kebun", optOther: "Lainnya", btnCancel: "Batal", btnSave: "Simpan",
+                modalAddLogTitle: "Tambah Catatan Riwayat", lblDate: "Tanggal", lblCategory: "Kategori",
+                catEngineOil: "Oli Mesin", catGearboxOil: "Oli Transmisi", catTimingBelt: "Sabuk Timing", catAuxBelt: "Sabuk Kipas/Aksesori",
+                catBrakeFluid: "Minyak Rem", catCoolant: "Cairan Pendingin (Coolant)", catPowerSteering: "Minyak Power Steering", catSparkPlugs: "Busi / Busi Pijar",
+                catFilters: "Filter (Udara / Kabin)", catAC: "Servis AC", catRepair: "Perbaikan / Kerusakan", catOther: "Lainnya",
+                chkOilFilter: "Filter oli diganti", chkTensioner: "Tensioner diganti", chkPulleys: "Pulley diganti", chkWaterPump: "Pompa air diganti",
+                chkACDryer: "Dryer AC diganti", chkACGas: "Freon AC diisi", chkAirFilter: "Filter udara diganti", chkCabinFilter: "Filter kabin diganti",
+                lblLogMileage: "Kilometer (opsional)", lblCost: "Biaya dalam PLN (opsional)", lblDesc: "Deskripsi / Suku Cadang / Catatan"
+            },
+            ru: {
+                appTitle: "Сервисная Книжка Техники", appSub: "История обслуживания, замены жидкостей и ремонтов в одном месте",
+                btnBg: "Обои", btnPrint: "PDF / Печать", btnInstall: "Установить", btnImport: "Импорт", btnExport: "Экспорт", btnAddVehicle: "Добавить технику", btnAddLog: "Запись",
+                lblMileage: "Пробег:", lblStatusHeader: "Индикатор Жидкостей", btnShowAll: "Показать все", lblExpenses: "Затраты на ремонт", lblTotal: "Итого PLN:",
+                lblChartTitle: "График Расходов", lblTimeline: "Хронологическая История Обслуживания", searchPlaceholder: "Поиск в истории...", allYears: "Все года", noData: "Нет данных", lblRights: "Все права защищены",
+                modalAddVehicleTitle: "Добавить Новую Технику", lblVehicleName: "Название / Модель", lblVehicleType: "Тип техники / Оборудования",
+                optCar: "Автомобиль", optBike: "Мотоцикл", optGarden: "Газонокосилка / Садовая техника", optOther: "Другое", btnCancel: "Отмена", btnSave: "Сохранить",
+                modalAddLogTitle: "Добавить Запись в Историю", lblDate: "Дата", lblCategory: "Категория",
+                catEngineOil: "Моторное масло", catGearboxOil: "Трансмиссионное масло", catTimingBelt: "Ремень ГРМ", catAuxBelt: "Приводной ремень",
+                catBrakeFluid: "Тормозная жидкость", catCoolant: "Охлаждающая жидкость", catPowerSteering: "Жидкость ГУР", catSparkPlugs: "Свечи зажигания / накала",
+                catFilters: "Фильтры (Воздушный / Салонный)", catAC: "Сервис кондиционера", catRepair: "Ремонт / Неисправность", catOther: "Другое",
+                chkOilFilter: "Заменен масляный фильтр", chkTensioner: "Заменен натяжитель", chkPulleys: "Заменены ролики", chkWaterPump: "Заменена водяная помпа",
+                chkACDryer: "Заменен осушитель кондиционера", chkACGas: "Заправлен хладагент AC", chkAirFilter: "Заменен воздушный фильтр", chkCabinFilter: "Заменен салонный фильтр",
+                lblLogMileage: "Пробег (опционально)", lblCost: "Стоимость в PLN (опционально)", lblDesc: "Описание / Запчасти / Заметки"
+            }
+        };
+
+        let currentLang = localStorage.getItem('garage_lang') || 'pl';
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('garage_lang', lang);
+            document.getElementById('langSelect').value = lang;
+            applyTranslations();
+            render();
+        }
+
+        function applyTranslations() {
+            const langData = i18n[currentLang] || i18n.pl;
+            document.querySelectorAll('[data-i18n]').forEach(elem => {
+                const key = elem.getAttribute('data-i18n');
+                if (langData[key]) {
+                    elem.innerText = langData[key];
+                }
+            });
+
+            document.getElementById('searchInput').placeholder = langData.searchPlaceholder;
+        }
+
+        function getCategoryTranslation(catName) {
+            const langData = i18n[currentLang] || i18n.pl;
+            const map = {
+                "Olej Silnikowy": langData.catEngineOil,
+                "Olej Skrzyni Biegów": langData.catGearboxOil,
+                "Pasek Rozrządu": langData.catTimingBelt,
+                "Pasek Pomocniczy": langData.catAuxBelt,
+                "Płyn Hamulcowy": langData.catBrakeFluid,
+                "Płyn Chłodniczy": langData.catCoolant,
+                "Płyn Wspomagania": langData.catPowerSteering,
+                "Świece Zapłonowe / Żarowe": langData.catSparkPlugs,
+                "Filtry": langData.catFilters,
+                "Serwis Klimatyzacji": langData.catAC,
+                "Naprawa / Usterka": langData.catRepair,
+                "Inne": langData.catOther
+            };
+            return map[catName] || catName;
+        }
+
+        // PWA INSTALL PROMPT
+        let deferredPrompt;
+        const installBtn = document.getElementById('installAppBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (installBtn) installBtn.classList.remove('hidden');
+        });
+
+        function installPWA() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                deferredPrompt = null;
+                if (installBtn) installBtn.classList.add('hidden');
+            });
+        }
+
+        window.addEventListener('appinstalled', () => {
+            if (installBtn) installBtn.classList.add('hidden');
+        });
+
+        // REJESTRACJA SERVICE WORKERA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then((reg) => console.log('Service Worker gotowy:', reg.scope))
+                    .catch((err) => console.error('Błąd Service Workera:', err));
+            });
+        }
+
+        // BLOKADA SKRÓTÓW
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 123 || 
+               (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) ||
+               (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83))) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // WGRYWANIE TŁA
+        function loadCustomBg() {
+            const savedBg = localStorage.getItem('garage_custom_bg');
+            const resetBtn = document.getElementById('resetBgBtn');
+            if (savedBg) {
+                document.body.style.backgroundImage = `url('${savedBg}')`;
+                resetBtn.classList.remove('hidden');
+            } else {
+                document.body.style.backgroundImage = 'none';
+                resetBtn.classList.add('hidden');
+            }
+        }
+
+        function handleBgUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const bgData = e.target.result;
+                try {
+                    localStorage.setItem('garage_custom_bg', bgData);
+                    loadCustomBg();
+                } catch (err) {
+                    alert("Obrazek jest zbyt duży dla pamięci podręcznej.");
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetBg() {
+            localStorage.removeItem('garage_custom_bg');
+            loadCustomBg();
+        }
+
+        const initialGarageData = {
+          "activeId": 1,
+          "vehicles": [
+            { "id": 1, "name": "VW Passat B6 2.0 FSI (2006)", "type": "Samochód", "currentMileage": 270400 },
+            { "id": 2, "name": "Nissan Primastar 1.9 dCi (2006)", "type": "Samochód", "currentMileage": 241108 },
+            { "id": 3, "name": "Honda Shadow VT125 (1998)", "type": "Motocykl", "currentMileage": 15514 }
+          ],
+          "logs": [
+            { "id": 101, "vehicleId": 1, "date": "2022-04-01", "category": "Naprawa / Usterka", "mileage": "", "cost": 1200, "desc": "Wymiana hamulca pomocniczego." },
+            { "id": 102, "vehicleId": 1, "date": "2022-05-01", "category": "Inne", "mileage": "", "cost": 1800, "desc": "Nowy akumulator (Szwajcaria, 400 CHF)." },
+            { "id": 103, "vehicleId": 1, "date": "2022-05-15", "category": "Pasek Rozrządu", "mileage": "192 500 km", "cost": 0, "desc": "Wymieniono napinacz. Wymieniono rolki.\nPasek Continental. Uszkodzona i wymieniona poduszka silnika." },
+            { "id": 104, "vehicleId": 1, "date": "2022-06-01", "category": "Olej Silnikowy", "mileage": "199 000 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nZalano olej 5W30. Wymiana świec zapłonowych, filtra powietrza, filtra kabinowego oraz filtra paliwa. Test płynu chłodniczego reflektometrem (-45°C). Naprawa lusterka." },
+            { "id": 105, "vehicleId": 1, "date": "2022-10-01", "category": "Świece Zapłonowe / Żarowe", "mileage": "205 000 km", "cost": 0, "desc": "Wymiana cewek zapłonowych na nowe NGK (po diagnozie wypadania zapłonów na 3. cylindrze)." },
+            { "id": 106, "vehicleId": 1, "date": "2023-01-10", "category": "Naprawa / Usterka", "mileage": "211 700 km", "cost": 0, "desc": "Wypadanie zapłonu cyl. 1, uboga mieszanka za katalizatorem, nierówna praca na biegu jałowym." },
+            { "id": 107, "vehicleId": 1, "date": "2023-01-15", "category": "Naprawa / Usterka", "mileage": "211 855 km", "cost": 0, "desc": "Wymiana katalizatora. Dodano dodatek Liqui Moly. Brak wypadania zapłonów." },
+            { "id": 108, "vehicleId": 1, "date": "2023-03-15", "category": "Olej Silnikowy", "mileage": "215 244 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nShell 5W40." },
+            { "id": 109, "vehicleId": 1, "date": "2023-03-16", "category": "Olej Skrzyni Biegów", "mileage": "215 314 km", "cost": 0, "desc": "Wymiana oleju w skrzyni biegów Shell 75W90. Wymiana filtra kabinowego. Czyszczenie i serwis wtryskiwaczy, wymiana uszczelek." },
+            { "id": 110, "vehicleId": 1, "date": "2023-04-10", "category": "Naprawa / Usterka", "mileage": "217 800 km", "cost": 0, "desc": "Wymiana 4 sztuk zaworów wtryskowych (wtryskiwaczy) na nowe." },
+            { "id": 111, "vehicleId": 1, "date": "2023-06-15", "category": "Serwis Klimatyzacji", "mileage": "218 000 km", "cost": 0, "desc": "Uzupełniono/napełniono czynnik AC.\nWymiana czynnika R134a. Klima działa bardzo dobrze." },
+            { "id": 112, "vehicleId": 1, "date": "2023-07-23", "category": "Naprawa / Usterka", "mileage": "221 000 km", "cost": 0, "desc": "Wyciek chłodniczki oleju. Uszkodzenie chłodniczki, uszczelki i obudowy filtra oleju." },
+            { "id": 113, "vehicleId": 1, "date": "2023-07-28", "category": "Naprawa / Usterka", "mileage": "221 500 km", "cost": 0, "desc": "Naprawa zerwanego gwintu w głowicy cylindrów (wstawiono 2 tulejki)." },
+            { "id": 114, "vehicleId": 1, "date": "2023-07-29", "category": "Olej Silnikowy", "mileage": "221 633 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nMontaż nowej chłodniczki oleju, obudowy filtra, uszczelki i filtra oleju. Zalanie świeżego płynu chłodzącego oraz oleju." },
+            { "id": 115, "vehicleId": 1, "date": "2023-08-01", "category": "Naprawa / Usterka", "mileage": "222 000 km", "cost": 0, "desc": "Grzanie się lewego tylnego hamulca po trasie ze Szwajcarii. Wymiana klocków przód/tył oraz nowa szczęka hamulcowa tył lewy." },
+            { "id": 116, "vehicleId": 1, "date": "2023-08-08", "category": "Inne", "mileage": "222 500 km", "cost": 0, "desc": "Podłączenie Multidiag – reset wartości wyuczonych wtryskiwaczy. Dociągnięcie śrub pokrywy zaworów (8-15 Nm)." },
+            { "id": 117, "vehicleId": 1, "date": "2023-08-16", "category": "Naprawa / Usterka", "mileage": "223 000 km", "cost": 0, "desc": "Spadek kompresji cyl. 1 (9 bar, reszta 12.5 bar). Widoczne ślady zużycia na wałku rozrządu i popychaczu na 1. cylindrze. Wałek do wymiany." },
+            { "id": 118, "vehicleId": 1, "date": "2023-11-01", "category": "Płyn Hamulcowy", "mileage": "226 000 km", "cost": 0, "desc": "Wymiana płynu hamulcowego. Wymiana silniczka elektrycznego hamulca postojowego tył prawy." },
+            { "id": 119, "vehicleId": 1, "date": "2024-04-04", "category": "Olej Silnikowy", "mileage": "232 740 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nWymiana oleju silnikowego oraz filtra oleju." },
+            { "id": 120, "vehicleId": 1, "date": "2025-03-31", "category": "Olej Silnikowy", "mileage": "242 759 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nCastrol Edge 5W30 C3. Wymiana płynu hamulcowego Liqui Moly SL6 DOT4." },
+            { "id": 121, "vehicleId": 1, "date": "2025-04-04", "category": "Naprawa / Usterka", "mileage": "242 759 km", "cost": 0, "desc": "Nowy wałek rozrządu (strona ssąca), nowy łańcuch rozrządu + napinacz, nowy popychacz pompy wysokiego ciśnienia, 8x dźwigienki zaworowe, 3x podkładka nastawnika. Silnik pracuje równo na wolnych obrotach." },
+            { "id": 122, "vehicleId": 1, "date": "2025-07-04", "category": "Naprawa / Usterka", "mileage": "246 399 km", "cost": 0, "desc": "Wymiana tarcz i klocków hamulcowych przód (L+P) BRP." },
+            { "id": 123, "vehicleId": 1, "date": "2025-07-05", "category": "Serwis Klimatyzacji", "mileage": "246 400 km", "cost": 0, "desc": "Uzupełniono/napełniono czynnik AC.\nPłukanie obwodu, wymiana oleju kompresora, odzysk 74g, nabite 600g czynnika. Nowe świece zapłonowe Bosch." },
+            { "id": 124, "vehicleId": 1, "date": "2025-07-22", "category": "Naprawa / Usterka", "mileage": "249 637 km", "cost": 0, "desc": "Wymiana katalizatora na BM Catalyst (błąd P0420)." },
+            { "id": 125, "vehicleId": 1, "date": "2025-07-24", "category": "Filtry", "mileage": "249 700 km", "cost": 0, "desc": "Wymieniono filtr powietrza.\nWymiana czujnika AIT (czujnik temperatury powietrza dolotowego). Reset ECU." },
+            { "id": 126, "vehicleId": 1, "date": "2025-07-25", "category": "Naprawa / Usterka", "mileage": "249 720 km", "cost": 0, "desc": "Czyszczenie elektrozaworu zmiennych faz rozrządu. Test faz zakonczony pomyślnie." },
+            { "id": 127, "vehicleId": 1, "date": "2025-07-26", "category": "Naprawa / Usterka", "mileage": "249 755 km", "cost": 0, "desc": "Czyszczenie przepustnicy i kolektora ssącego. Nowy czujnik MAP (poprawa z 300mbar do 430mbar). Usunięcie nieszczelności podciśnienia. Nowe sondy lambda (2x przed katem, 1x za katem)." },
+            { "id": 128, "vehicleId": 1, "date": "2025-08-01", "category": "Płyn Chłodniczy", "mileage": "250 000 km", "cost": 0, "desc": "Wymiana termostatu (silnik się przegrzewał)." },
+            { "id": 129, "vehicleId": 1, "date": "2026-02-14", "category": "Olej Silnikowy", "mileage": "259 000 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nRavenol 5W40 + filtr Mann. Wymiana paska pomocniczego (Continental) i napinacza SKF. Diagnoza błędu P0420." },
+            { "id": 130, "vehicleId": 1, "date": "2026-03-16", "category": "Naprawa / Usterka", "mileage": "260 000 km", "cost": 0, "desc": "Wymiana silniczków krokowych klap temperatury nagrzewnicy (V157 i V158)." },
+            { "id": 131, "vehicleId": 1, "date": "2026-03-21", "category": "Naprawa / Usterka", "mileage": "260 445 km", "cost": 2900, "desc": "Montaż nowego, oryginalnego zmodyfikowanego katalizatora VW/Audi." },
+            { "id": 132, "vehicleId": 1, "date": "2026-04-14", "category": "Serwis Klimatyzacji", "mileage": "262 000 km", "cost": 0, "desc": "Naprawa przerwanej wiązki elektrycznej zaworu kompresora klimatyzacji." },
+            { "id": 133, "vehicleId": 1, "date": "2026-07-23", "category": "Naprawa / Usterka", "mileage": "266 663 km", "cost": 0, "desc": "Wymiana tylnych tulei wahacza lewa i prawa strona (Meyle HD)." },
+            { "id": 134, "vehicleId": 1, "date": "2026-08-19", "category": "Naprawa / Usterka", "mileage": "270 400 km", "cost": 0, "desc": "Wymiana przednich tulei wahacza lewa i prawa strona (Lemförder)." },
+            { "id": 201, "vehicleId": 2, "date": "2024-03-11", "category": "Płyn Wspomagania", "mileage": "219 780 km", "cost": 0, "desc": "Awaria wspomagania kierownicy. Montaż nowego przewodu olejowego, zalanie świeżego płynu wspomagania. Wymiana przycisku świateł awaryjnych." },
+            { "id": 202, "vehicleId": 2, "date": "2024-03-24", "category": "Pasek Rozrządu", "mileage": "220 373 km", "cost": 0, "desc": "Wymieniono napinacz. Wymieniono pompę wody.\nKompletny zestaw rozrządu (oryginał) + świeży płyn chłodzący." },
+            { "id": 203, "vehicleId": 2, "date": "2024-03-25", "category": "Olej Silnikowy", "mileage": "220 373 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nShell Helix Ultra 5W40 (5L). Wymiana oleju w skrzyni biegów (Elf Tranself 75W + Shell 75W). Wymiana filtra kabinowego i powietrza." },
+            { "id": 204, "vehicleId": 2, "date": "2024-03-26", "category": "Płyn Hamulcowy", "mileage": "220 375 km", "cost": 0, "desc": "Wymiana płynu hamulcowego." },
+            { "id": 205, "vehicleId": 2, "date": "2024-04-03", "category": "Filtry", "mileage": "220 736 km", "cost": 0, "desc": "Wymiana filtra paliwa na nowy, oryginalny." },
+            { "id": 206, "vehicleId": 2, "date": "2024-04-25", "category": "Świece Zapłonowe / Żarowe", "mileage": "211 323 km", "cost": 0, "desc": "Wymiana świec żarowych (1, 3, 4 nowe, nr 2 złamana ale szczelna). Nowe kapturki świec." },
+            { "id": 207, "vehicleId": 2, "date": "2024-04-27", "category": "Naprawa / Usterka", "mileage": "211 323 km", "cost": 0, "desc": "Montaż nowego uszczelniacza wału napędowego z tulejką Renault." },
+            { "id": 208, "vehicleId": 2, "date": "2024-04-29", "category": "Naprawa / Usterka", "mileage": "211 323 km", "cost": 0, "desc": "Wymiana uszczelki miski olejowej." },
+            { "id": 209, "vehicleId": 2, "date": "2024-07-18", "category": "Naprawa / Usterka", "mileage": "224 476 km", "cost": 0, "desc": "Wymiana modułu ABS, bezpiecznika 50A oraz świec podgrzewacza płynu chłodzącego." },
+            { "id": 210, "vehicleId": 2, "date": "2024-07-21", "category": "Serwis Klimatyzacji", "mileage": "224 476 km", "cost": 0, "desc": "Uzupełniono/napełniono czynnik AC." },
+            { "id": 211, "vehicleId": 2, "date": "2024-07-27", "category": "Olej Skrzyni Biegów", "mileage": "224 476 km", "cost": 0, "desc": "Uzupełnienie oleju w skrzyni biegów do poziomu 2.7 L." },
+            { "id": 212, "vehicleId": 2, "date": "2024-08-03", "category": "Serwis Klimatyzacji", "mileage": "226 024 km", "cost": 0, "desc": "Wymiana kompresora klimatyzacji na regenerowany (12 miesięcy gwarancji)." },
+            { "id": 213, "vehicleId": 2, "date": "2025-03-15", "category": "Naprawa / Usterka", "mileage": "232 778 km", "cost": 0, "desc": "Wymiana obu końcówek drążków kierowniczych. Wymiana zestawu zawieszenia tył (resory, sprężyny, amortyzatory)." },
+            { "id": 214, "vehicleId": 2, "date": "2025-03-31", "category": "Olej Silnikowy", "mileage": "233 154 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nTotal Quartz 9000 Energy 5W40. Sprawdzenie stanu oleju w skrzyni biegów." },
+            { "id": 215, "vehicleId": 2, "date": "2025-05-12", "category": "Naprawa / Usterka", "mileage": "235 000 km", "cost": 0, "desc": "Wymiana głowicy i zregenerowanych wtryskiwaczy (powód: usunięcie żarnika świecy wciśniętego w tłok). Nowa uszczelka pod głowicą. Dolewka oleju 5W40." },
+            { "id": 216, "vehicleId": 2, "date": "2025-06-08", "category": "Olej Skrzyni Biegów", "mileage": "236 000 km", "cost": 0, "desc": "Dolewka 500ml oleju 75W90 do skrzyni biegów." },
+            { "id": 217, "vehicleId": 2, "date": "2025-07-05", "category": "Serwis Klimatyzacji", "mileage": "237 000 km", "cost": 0, "desc": "Uzupełniono/napełniono czynnik AC.\nOdzysk 310g, napełnienie 750g + 20ml oleju." },
+            { "id": 218, "vehicleId": 2, "date": "2026-04-16", "category": "Olej Silnikowy", "mileage": "239 642 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nQuartz 9000 Ultimate 5W40 + filtr Mann. Wymiana płynu hamulcowego, wysprzęglika oraz przewodu powrotnego oleju z turbiny." },
+            { "id": 219, "vehicleId": 2, "date": "2026-04-21", "category": "Pasek Pomocniczy", "mileage": "239 700 km", "cost": 0, "desc": "Wymiana paska osprzętu, napinacza oraz rolki (zestaw Gates)." },
+            { "id": 220, "vehicleId": 2, "date": "2026-05-20", "category": "Naprawa / Usterka", "mileage": "240 382 km", "cost": 0, "desc": "Wymiana sprzęgiełka alternatora (Gates) i poduszki silnika (Lemförder). Wymiana lewego półwału z łożyskiem (SKF) – wyeliminowanie wycia powyżej 2000 RPM. Sprawdzenie stanu i szczelności skrzyni (2850ml oleju, czysto)." },
+            { "id": 221, "vehicleId": 2, "date": "2026-06-03", "category": "Serwis Klimatyzacji", "mileage": "240 800 km", "cost": 0, "desc": "Wymieniono osuszacz klimatyzacji.\nKompleksowa reanimacja klimatyzacji: płukanie układu, nowy kompresor Delphi (+40ml PAG150), nowy skraplacz i dysza rozprężna." },
+            { "id": 222, "vehicleId": 2, "date": "2026-06-05", "category": "Serwis Klimatyzacji", "mileage": "240 850 km", "cost": 0, "desc": "Uzupełniono/napełniono czynnik AC.\nPróba szczelności azotem/próżnia, napełnienie klimatyzacji w Q-Service." },
+            { "id": 223, "vehicleId": 2, "date": "2026-07-01", "category": "Olej Skrzyni Biegów", "mileage": "241 108 km", "cost": 0, "desc": "Zalano 2.5L oleju Elf Tranself NFX 75W.\nDemontaż skrzyni: nowy uszczelniacz wału korbowego, szlif koła zamachowego, nowe sprzęgło, nowy uszczelniacz skrzyni i wysprzęglik." },
+            { "id": 301, "vehicleId": 3, "date": "2022-05-01", "category": "Olej Silnikowy", "mileage": "8 000 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nWymiana oleju silnikowego, filtra oleju oraz świec zapłonowych." },
+            { "id": 302, "vehicleId": 3, "date": "2023-03-23", "category": "Olej Silnikowy", "mileage": "11 433 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nWymiana oleju silnikowego i filtra (moment korka 25 Nm, obudowy 10 Nm)." },
+            { "id": 303, "vehicleId": 3, "date": "2023-11-20", "category": "Inne", "mileage": "13 000 km", "cost": 0, "desc": "Smarowanie łożysk kół i kierownicy. Wymiana płynu chłodniczego i hamulcowego. Regulacja zaworów. Nowe klocki hamulcowe przód oraz nowy łańcuch napędowy." },
+            { "id": 304, "vehicleId": 3, "date": "2024-04-05", "category": "Olej Silnikowy", "mileage": "13 328 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nWymiana oleju, filtra, naciąg łańcucha oraz regulacja zaworów." },
+            { "id": 305, "vehicleId": 3, "date": "2024-04-09", "category": "Naprawa / Usterka", "mileage": "13 328 km", "cost": 0, "desc": "Korekta luzów zaworowych (FT ssący 0.15 / wydech 0.20, RT ssący 0.15 / wydech 0.20). Wkręcone nowe śruby M6x0.75." },
+            { "id": 306, "vehicleId": 3, "date": "2024-07-15", "category": "Naprawa / Usterka", "mileage": "13 500 km", "cost": 0, "desc": "Urwany zawór. Montaż nowego zaworu RT, nowego łańcuszka rozrządu RT oraz komplet nowych uszczelek." },
+            { "id": 307, "vehicleId": 3, "date": "2025-01-26", "category": "Naprawa / Usterka", "mileage": "14 000 km", "cost": 0, "desc": "Nowe łożyska wałków rozrządu (komplet przód + tył). Montaż oryginalnych śrub mocowania wałków." },
+            { "id": 308, "vehicleId": 3, "date": "2025-03-31", "category": "Olej Silnikowy", "mileage": "14 477 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nWymiana oleju silnikowego oraz wymiana płynu hamulcowego." },
+            { "id": 309, "vehicleId": 3, "date": "2026-04-18", "category": "Olej Silnikowy", "mileage": "15 514 km", "cost": 0, "desc": "Wymieniono filtr oleju.\nWymiana oleju silnikowego wraz z filtrem." },
+            { "id": 1792009975219, "vehicleId": 2, "date": "2024-03-23", "category": "Płyn Chłodniczy", "mileage": "220373", "cost": 0, "desc": "Nowy plyn chlodniczy" },
+            { "id": 1792010381676, "vehicleId": 1, "date": "2026-02-14", "category": "Pasek Pomocniczy", "mileage": "259000", "cost": 0, "desc": "Pasek wielorowkowy Coninental, napinacz paska SFK" }
+          ]
+        };
+
+        const CATEGORY_INTERVALS = {
+            "Olej Silnikowy": { monthsYellow: 10, monthsRed: 12, kmYellow: 10000, kmRed: 15000 },
+            "Płyn Hamulcowy": { monthsYellow: 20, monthsRed: 24, kmYellow: 30000, kmRed: 40000 },
+            "Płyn Chłodniczy": { monthsYellow: 48, monthsRed: 60, kmYellow: 60000, kmRed: 80000 },
+            "Pasek Rozrządu": { monthsYellow: 48, monthsRed: 60, kmYellow: 50000, kmRed: 60000 },
+            "Pasek Pomocniczy": { monthsYellow: 36, monthsRed: 48, kmYellow: 40000, kmRed: 50000 },
+            "Olej Skrzyni Biegów": { monthsYellow: 48, monthsRed: 60, kmYellow: 50000, kmRed: 60000 },
+            "Płyn Wspomagania": { monthsYellow: 48, monthsRed: 60, kmYellow: 50000, kmRed: 60000 },
+            "Świece Zapłonowe / Żarowe": { monthsYellow: 24, monthsRed: 36, kmYellow: 30000, kmRed: 45000 },
+            "Serwis Klimatyzacji": { monthsYellow: 10, monthsRed: 12, kmYellow: 15000, kmRed: 20000 }
+        };
+
+        let data = JSON.parse(localStorage.getItem('garage_data')) || initialGarageData;
+        let selectedCategoryFilter = null;
+        let selectedYearFilter = "";
+        let searchQuery = "";
+        let expensesChartInstance = null;
+
+        function parseKm(val) {
+            if (!val) return null;
+            const clean = val.toString().replace(/\s+/g, '').replace(/[^0-9]/g, '');
+            const num = parseInt(clean, 10);
+            return isNaN(num) ? null : num;
+        }
+
+        function saveData() {
+            localStorage.setItem('garage_data', JSON.stringify(data));
+            render();
+        }
+
+        function updateVehicleMileage(e) {
+            const current = data.vehicles.find(v => v.id === data.activeId);
+            if (current) {
+                const val = parseKm(e.target.value);
+                current.currentMileage = val || 0;
+                saveData();
+            }
+        }
+
+        function setCategoryFilter(category) {
+            if (selectedCategoryFilter === category) {
+                selectedCategoryFilter = null;
+            } else {
+                selectedCategoryFilter = category;
+            }
+            render();
+        }
+
+        function handleSearch(e) {
+            searchQuery = e.target.value.toLowerCase().trim();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (searchQuery.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            render();
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            searchQuery = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            render();
+        }
+
+        function handleYearChange(e) {
+            selectedYearFilter = e.target.value;
+            render();
+        }
+
+        function populateYearSelect(currentVehicleLogs) {
+            const yearSelect = document.getElementById('yearFilter');
+            const langData = i18n[currentLang] || i18n.pl;
+            const years = [...new Set(currentVehicleLogs.map(l => l.date.split('-')[0]))].sort((a,b) => b - a);
+            
+            let optionsHTML = `<option value="">${langData.allYears}</option>`;
+            years.forEach(y => {
+                const selected = selectedYearFilter === y ? 'selected' : '';
+                optionsHTML += `<option value="${y}" ${selected}>${y}</option>`;
+            });
+            yearSelect.innerHTML = optionsHTML;
+        }
+
+        function getStatusIndicator(catName, lastLog, currentVehicleKm) {
+            const langData = i18n[currentLang] || i18n.pl;
+            if (!lastLog) {
+                return { dotClass: 'bg-slate-600', textClass: 'bg-slate-800 text-slate-500 border-slate-700', label: langData.noData };
+            }
+
+            const interval = CATEGORY_INTERVALS[catName] || { monthsYellow: 12, monthsRed: 24, kmYellow: 15000, kmRed: 20000 };
+
+            const lastDate = new Date(lastLog.date);
+            const now = new Date();
+            const monthDiff = (now.getFullYear() - lastDate.getFullYear()) * 12 + (now.getMonth() - lastDate.getMonth());
+
+            const lastKm = parseKm(lastLog.mileage);
+            let kmDiff = null;
+            if (lastKm !== null && currentVehicleKm !== null && currentVehicleKm >= lastKm) {
+                kmDiff = currentVehicleKm - lastKm;
+            }
+
+            let isRed = monthDiff >= interval.monthsRed || (kmDiff !== null && kmDiff >= interval.kmRed);
+            let isYellow = monthDiff >= interval.monthsYellow || (kmDiff !== null && kmDiff >= interval.kmYellow);
+
+            let labelText = `${lastLog.date}`;
+            if (kmDiff !== null) {
+                labelText += ` (${kmDiff.toLocaleString('pl-PL')} km)`;
+            } else {
+                labelText += ` (${monthDiff}m)`;
+            }
+
+            if (isRed) {
+                return { 
+                    dotClass: 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]', 
+                    textClass: 'bg-red-950/80 text-red-400 border-red-800/80', 
+                    label: labelText 
+                };
+            } else if (isYellow) {
+                return { 
+                    dotClass: 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]', 
+                    textClass: 'bg-amber-950/80 text-amber-300 border-amber-800/80', 
+                    label: labelText 
+                };
+            } else {
+                return { 
+                    dotClass: 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]', 
+                    textClass: 'bg-emerald-950/80 text-emerald-400 border-emerald-800/80', 
+                    label: labelText 
+                };
+            }
+        }
+
+        function renderChart(logs) {
+            const ctx = document.getElementById('expensesChart');
+            if (!ctx) return;
+
+            const monthlyData = {};
+            const sortedLogs = [...logs].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            sortedLogs.forEach(log => {
+                const cost = parseFloat(log.cost) || 0;
+                if (cost > 0) {
+                    const monthKey = log.date.substring(0, 7);
+                    monthlyData[monthKey] = (monthlyData[monthKey] || 0) + cost;
+                }
+            });
+
+            const labels = Object.keys(monthlyData);
+            const dataValues = Object.values(monthlyData);
+
+            if (expensesChartInstance) {
+                expensesChartInstance.destroy();
+            }
+
+            if (labels.length === 0) {
+                return;
+            }
+
+            expensesChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'PLN',
+                        data: dataValues,
+                        backgroundColor: '#10b981',
+                        hoverBackgroundColor: '#f59e0b',
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` Suma: ${context.raw.toLocaleString('pl-PL')} zł`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: '#94a3b8', font: { size: 10 } },
+                            grid: { display: false }
+                        },
+                        y: {
+                            ticks: { color: '#94a3b8', font: { size: 10 } },
+                            grid: { color: '#334155' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function render() {
+            applyTranslations();
+
+            const tabs = document.getElementById('vehicleTabs');
+            tabs.innerHTML = '';
+            data.vehicles.forEach(v => {
+                const active = v.id === data.activeId;
+                tabs.innerHTML += `
+                    <button onclick="setActive(${v.id})" class="px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition ${active ? 'bg-amber-500 text-slate-950' : 'bg-slate-800/90 text-slate-300 hover:bg-slate-700'}">
+                        ${v.name}
+                    </button>
+                `;
+            });
+
+            const current = data.vehicles.find(v => v.id === data.activeId) || data.vehicles[0];
+            if(!current) {
+                document.getElementById('mainContent').classList.add('hidden');
+                return;
+            } else {
+                document.getElementById('mainContent').classList.remove('hidden');
+            }
+            
+            data.activeId = current.id;
+
+            document.getElementById('currentVehicleName').innerText = current.name;
+            document.getElementById('currentVehicleType').innerText = current.type;
+
+            const currentVehicleLogs = data.logs.filter(l => l.vehicleId === current.id);
+
+            if (!current.currentMileage && currentVehicleLogs.length > 0) {
+                const logsWithKm = currentVehicleLogs.map(l => parseKm(l.mileage)).filter(km => km !== null);
+                if (logsWithKm.length > 0) {
+                    current.currentMileage = Math.max(...logsWithKm);
+                }
+            }
+
+            document.getElementById('currentMileageInput').value = current.currentMileage ? current.currentMileage.toLocaleString('pl-PL') : '';
+
+            const clearBtn = document.getElementById('clearFilterBtn');
+            if (selectedCategoryFilter) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+
+            populateYearSelect(currentVehicleLogs);
+
+            const categories = [
+                "Olej Silnikowy", 
+                "Olej Skrzyni Biegów", 
+                "Pasek Rozrządu", 
+                "Pasek Pomocniczy",
+                "Płyn Hamulcowy", 
+                "Płyn Chłodniczy", 
+                "Płyn Wspomagania",
+                "Świece Zapłonowe / Żarowe",
+                "Serwis Klimatyzacji"
+            ];
+            const statusList = document.getElementById('statusList');
+            statusList.innerHTML = '';
+
+            categories.forEach(cat => {
+                const vLogs = currentVehicleLogs.filter(l => l.category === cat)
+                                                 .sort((a,b) => new Date(b.date) - new Date(a.date));
+                const last = vLogs[0];
+                const isSelected = selectedCategoryFilter === cat;
+                const status = getStatusIndicator(cat, last, current.currentMileage);
+                const translatedCat = getCategoryTranslation(cat);
+
+                statusList.innerHTML += `
+                    <div onclick="setCategoryFilter('${cat}')" class="flex justify-between items-center p-2.5 rounded-lg border cursor-pointer transition select-none ${isSelected ? 'bg-amber-500/20 border-amber-500 text-amber-300' : 'bg-slate-900/60 border-slate-700/50 text-slate-300 hover:border-slate-500 hover:bg-slate-900'}">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-2.5 h-2.5 rounded-full ${status.dotClass} flex-shrink-0"></span>
+                            <span class="text-xs font-medium">${translatedCat}</span>
+                        </div>
+                        <span class="text-xs font-mono px-2 py-0.5 rounded border ${status.textClass}">
+                            ${status.label}
+                        </span>
+                    </div>
+                `;
+            });
+
+            const timeline = document.getElementById('timelineList');
+            const timelineHeader = document.getElementById('timelineHeader');
+            const langData = i18n[currentLang] || i18n.pl;
+            timeline.innerHTML = '';
+
+            let filterInfo = [];
+            if (selectedCategoryFilter) filterInfo.push(`${getCategoryTranslation(selectedCategoryFilter)}`);
+            if (selectedYearFilter) filterInfo.push(`${selectedYearFilter}`);
+            if (searchQuery) filterInfo.push(`"${searchQuery}"`);
+
+            if (filterInfo.length > 0) {
+                timelineHeader.innerHTML = `<i class="fa-solid fa-filter text-amber-500"></i> ${filterInfo.join(" | ")}`;
+            } else {
+                timelineHeader.innerHTML = `<i class="fa-solid fa-clock-rotate-left text-amber-500"></i> ${langData.lblTimeline}`;
+            }
+
+            let currentLogs = [...currentVehicleLogs];
+
+            if (selectedCategoryFilter) {
+                currentLogs = currentLogs.filter(l => l.category === selectedCategoryFilter);
+            }
+
+            if (selectedYearFilter) {
+                currentLogs = currentLogs.filter(l => l.date.startsWith(selectedYearFilter));
+            }
+
+            if (searchQuery) {
+                currentLogs = currentLogs.filter(l => {
+                    const matchCategory = l.category.toLowerCase().includes(searchQuery);
+                    const matchDesc = l.desc.toLowerCase().includes(searchQuery);
+                    const matchMileage = l.mileage ? l.mileage.toLowerCase().includes(searchQuery) : false;
+                    const matchDate = l.date.includes(searchQuery);
+                    return matchCategory || matchDesc || matchMileage || matchDate;
+                });
+            }
+
+            const totalCost = currentLogs.reduce((sum, log) => sum + (parseFloat(log.cost) || 0), 0);
+            document.getElementById('totalCostDisplay').innerText = totalCost.toLocaleString('pl-PL') + ' zł';
+
+            renderChart(currentLogs);
+
+            currentLogs.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            if(currentLogs.length === 0) {
+                timeline.innerHTML = `<p class="text-slate-500 text-sm ml-4">${langData.noData}</p>`;
+            } else {
+                currentLogs.forEach(l => {
+                    const logCost = parseFloat(l.cost) || 0;
+                    const translatedLogCat = getCategoryTranslation(l.category);
+                    timeline.innerHTML += `
+                        <div class="ml-6 relative group">
+                            <span class="absolute -left-[31px] top-1.5 w-3 h-3 rounded-full bg-amber-500 ring-4 ring-slate-800"></span>
+                            <div class="bg-slate-900/80 border border-slate-700/70 rounded-lg p-4 transition hover:border-slate-600">
+                                <div class="flex justify-between items-start mb-1">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">${translatedLogCat}</span>
+                                        ${l.mileage ? `<span class="text-xs bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700 font-mono">${l.mileage}</span>` : ''}
+                                        ${logCost > 0 ? `<span class="text-xs bg-emerald-950/90 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800/80 font-mono font-bold"><i class="fa-solid fa-coins text-[10px] mr-1"></i>${logCost.toLocaleString('pl-PL')} zł</span>` : ''}
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs text-slate-400 font-mono">${l.date}</span>
+                                        <button onclick="deleteLog(${l.id})" title="Usuń" class="text-slate-600 hover:text-red-400 text-xs transition">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <p class="text-slate-200 text-sm whitespace-pre-line mt-1">${l.desc}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function toggleCheckboxes() {
+            const cat = document.getElementById('lCategory').value;
+            const container = document.getElementById('checkboxContainer');
+            
+            document.getElementById('chkOilFilter').classList.add('hidden');
+            document.getElementById('chkTimingBelt').classList.add('hidden');
+            document.getElementById('chkACDryer').classList.add('hidden');
+            document.getElementById('chkFilters').classList.add('hidden');
+
+            if (cat === "Olej Silnikowy") {
+                container.classList.remove('hidden');
+                document.getElementById('chkOilFilter').classList.remove('hidden');
+            } else if (cat === "Pasek Rozrządu") {
+                container.classList.remove('hidden');
+                document.getElementById('chkTimingBelt').classList.remove('hidden');
+                document.getElementById('chkTimingBelt').classList.add('flex');
+            } else if (cat === "Serwis Klimatyzacji") {
+                container.classList.remove('hidden');
+                document.getElementById('chkACDryer').classList.remove('hidden');
+                document.getElementById('chkACDryer').classList.add('flex');
+            } else if (cat === "Filtry") {
+                container.classList.remove('hidden');
+                document.getElementById('chkFilters').classList.remove('hidden');
+                document.getElementById('chkFilters').classList.add('flex');
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        function setActive(id) { 
+            data.activeId = id; 
+            selectedCategoryFilter = null;
+            selectedYearFilter = "";
+            clearSearch();
+            saveData(); 
+        }
+
+        function openVehicleModal() { document.getElementById('vehicleModal').classList.remove('hidden'); }
+        function closeVehicleModal() { document.getElementById('vehicleModal').classList.add('hidden'); }
+        function openLogModal() { 
+            document.getElementById('lDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('lCost').value = '';
+            toggleCheckboxes();
+            document.getElementById('logModal').classList.remove('hidden'); 
+        }
+        function closeLogModal() { document.getElementById('logModal').classList.add('hidden'); }
+
+        function saveVehicle(e) {
+            e.preventDefault();
+            const name = document.getElementById('vName').value;
+            const type = document.getElementById('vType').value;
+            const newId = Date.now();
+            data.vehicles.push({ id: newId, name, type, currentMileage: 0 });
+            data.activeId = newId;
+            selectedCategoryFilter = null;
+            selectedYearFilter = "";
+            closeVehicleModal();
+            document.getElementById('vehicleForm').reset();
+            saveData();
+        }
+
+        function saveLog(e) {
+            e.preventDefault();
+            const date = document.getElementById('lDate').value;
+            const category = document.getElementById('lCategory').value;
+            const mileage = document.getElementById('lMileage').value;
+            const costVal = parseFloat(document.getElementById('lCost').value) || 0;
+            let userDesc = document.getElementById('lDesc').value.trim();
+
+            let extraNotes = [];
+            const langData = i18n[currentLang] || i18n.pl;
+
+            if (category === "Olej Silnikowy" && document.getElementById('cOilFilter').checked) {
+                extraNotes.push(langData.chkOilFilter);
+            }
+            if (category === "Pasek Rozrządu") {
+                if (document.getElementById('cTBTensioner').checked) extraNotes.push(langData.chkTensioner);
+                if (document.getElementById('cTBPulley').checked) extraNotes.push(langData.chkPulleys);
+                if (document.getElementById('cTBWaterPump').checked) extraNotes.push(langData.chkWaterPump);
+            }
+            if (category === "Serwis Klimatyzacji") {
+                if (document.getElementById('cACDryer').checked) extraNotes.push(langData.chkACDryer);
+                if (document.getElementById('cACGas').checked) extraNotes.push(langData.chkACGas);
+            }
+            if (category === "Filtry") {
+                if (document.getElementById('cAirFilter').checked) extraNotes.push(langData.chkAirFilter);
+                if (document.getElementById('cCabinFilter').checked) extraNotes.push(langData.chkCabinFilter);
+            }
+
+            let fullDesc = extraNotes.join(". ");
+            if (userDesc) {
+                fullDesc = fullDesc ? `${fullDesc}.\n${userDesc}` : userDesc;
+            }
+
+            const newKm = parseKm(mileage);
+            const current = data.vehicles.find(v => v.id === data.activeId);
+            if (newKm && current && newKm > (current.currentMileage || 0)) {
+                current.currentMileage = newKm;
+            }
+
+            data.logs.push({ id: Date.now(), vehicleId: data.activeId, date, category, mileage, cost: costVal, desc: fullDesc || "OK" });
+            
+            document.getElementById('cOilFilter').checked = false;
+            document.getElementById('cTBTensioner').checked = false;
+            document.getElementById('cTBPulley').checked = false;
+            document.getElementById('cTBWaterPump').checked = false;
+            document.getElementById('cACDryer').checked = false;
+            document.getElementById('cACGas').checked = false;
+            document.getElementById('cAirFilter').checked = false;
+            document.getElementById('cCabinFilter').checked = false;
+            
+            closeLogModal();
+            document.getElementById('logForm').reset();
+            saveData();
+        }
+
+        function deleteLog(logId) {
+            if(confirm("Usuń wpis / Delete entry?")) {
+                data.logs = data.logs.filter(l => l.id !== logId);
+                saveData();
+            }
+        }
+
+        function deleteCurrentVehicle() {
+            if(data.vehicles.length <= 1) {
+                alert("Musisz posiadać co najmniej jedną maszynę.");
+                return;
+            }
+            if(confirm("Usuń maszynę wraz ze wszystkimi jej wpisami?")) {
+                data.logs = data.logs.filter(l => l.vehicleId !== data.activeId);
+                data.vehicles = data.vehicles.filter(v => v.id !== data.activeId);
+                data.activeId = data.vehicles[0].id;
+                selectedCategoryFilter = null;
+                selectedYearFilter = "";
+                saveData();
+            }
+        }
+
+        function exportData() {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `garaz_dziennik_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsedData = JSON.parse(e.target.result);
+                    if (parsedData && parsedData.vehicles && parsedData.logs) {
+                        data = parsedData;
+                        selectedCategoryFilter = null;
+                        selectedYearFilter = "";
+                        clearSearch();
+                        saveData();
+                        alert("OK!");
+                    } else {
+                        alert("Error JSON format");
+                    }
+                } catch (err) {
+                    alert("Error: " + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        document.getElementById('langSelect').value = currentLang;
+        loadCustomBg();
+        render();
+    </script>
+</body>
+</html>
