@@ -523,13 +523,32 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
 
         let currentLang = localStorage.getItem('garage_lang') || 'pl';
 
-        function setLanguage(lang) {
-            currentLang = lang;
-            localStorage.setItem('garage_lang', lang);
-            document.getElementById('langSelect').value = lang;
-            applyTranslations();
-            render();
-        }
+const currencyMap = {
+  pl: 'zł',
+  en: '$',
+  de: '€',
+  zh: '¥',
+  ja: '¥',
+  fil: '₱',
+  id: 'Rp',
+  ru: '₽'
+};
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('garage_lang', lang);
+
+  // Automatyczna zmiana waluty przypisanej do języka
+  if (currencyMap[lang]) {
+    localStorage.setItem('garage_currency', currencyMap[lang]);
+    const currSelect = document.getElementById('currencySelect');
+    if (currSelect) currSelect.value = currencyMap[lang];
+  }
+
+  document.getElementById('langSelect').value = lang;
+  applyTranslations();
+  render();
+}
 
         function applyTranslations() {
             const langData = i18n[currentLang] || i18n.pl;
@@ -1260,7 +1279,7 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
     </div>
   </div>
   <button id="pwaInstallBtn" class="bg-slate-950 text-amber-400 font-bold px-4 py-2 rounded-lg text-sm hover:bg-slate-900 transition-all">
-    Zainstaluj
+    Install
   </button>
 </div>
 
