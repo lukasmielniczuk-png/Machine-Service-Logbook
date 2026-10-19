@@ -217,7 +217,7 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                         </div>
                         <div class="bg-slate-900/90 p-3.5 rounded-lg border border-slate-700/80 flex justify-between items-center">
                             <span class="text-xs text-slate-400" data-i18n="lblTotal">Suma:</span>
-<span id="totalCostDisplay" class="text-xl font-bold font-mono text-emerald-400">0 <span class="currency-symbol">zł</span></span>
+                            <span id="totalCostDisplay" class="text-xl font-bold font-mono text-emerald-400">0 <span class="currency-symbol">zł</span></span>
                         </div>
                     </div>
 
@@ -379,7 +379,7 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                         <input type="text" id="lMileage" placeholder="np. 185 000 km" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100 focus:outline-none focus:border-emerald-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-1" data-i18n="lblCost">Koszt w PLN (opcjonalnie)</label>
+                        <label class="block text-sm font-medium mb-1" data-i18n="lblCost">Koszt (opcjonalnie)</label>
                         <input type="number" step="0.01" id="lCost" placeholder="np. 450" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-slate-100 focus:outline-none focus:border-emerald-500">
                     </div>
                 </div>
@@ -402,7 +402,7 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
             pl: {
                 appTitle: "Dziennik Serwisowy Maszyn", appSub: "Historia serwisu, wymian płynów i usterek w jednym miejscu",
                 btnBg: "Tło", btnPrint: "PDF / Druk", btnInstall: "Zainstaluj", btnImport: "Importuj", btnExport: "Eksportuj", btnAddVehicle: "Dodaj Maszynę", btnAddLog: "Wpis",
-                lblMileage: "Stan licznika:", lblStatusHeader: "Sygnalizator Płynów", btnShowAll: "Pokaż wszystkie", lblExpenses: "Wydatki Serwisowe", lblTotal: "Suma :",
+                lblMileage: "Stan licznika:", lblStatusHeader: "Sygnalizator Płynów", btnShowAll: "Pokaż wszystkie", lblExpenses: "Wydatki Serwisowe", lblTotal: "Suma:",
                 lblChartTitle: "Wykres Wydatków", lblTimeline: "Chronologiczna Historia Serwisu", searchPlaceholder: "Szukaj w historii...", allYears: "Wszystkie lata", noData: "Brak danych", lblRights: "Wszelkie prawa zastrzeżone",
                 modalAddVehicleTitle: "Dodaj Nową Maszynę", lblVehicleName: "Nazwa / Model", lblVehicleType: "Typ Pojazdu / Sprzętu",
                 optCar: "Samochód", optBike: "Motocykl", optGarden: "Kosiarka / Sprzęt Ogrodowy", optOther: "Inny", btnCancel: "Anuluj", btnSave: "Zapisz",
@@ -412,12 +412,12 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                 catFilters: "Filtry (Powietrza / Kabinowy)", catAC: "Serwis Klimatyzacji", catRepair: "Naprawa / Usterka", catOther: "Inne",
                 chkOilFilter: "Wymieniono filtr oleju", chkTensioner: "Wymieniono napinacz", chkPulleys: "Wymieniono rolki", chkWaterPump: "Wymieniono pompę wody",
                 chkACDryer: "Wymieniono osuszacz klimatyzacji", chkACGas: "Uzupełniono/napełniono czynnik AC", chkAirFilter: "Wymieniono filtr powietrza", chkCabinFilter: "Wymieniono filtr kabinowy",
-                lblLogMileage: "Przebieg (opcjonalnie)", lblCost: "Koszt w PLN (opcjonalnie)", lblDesc: "Opis / Części / Uwagi"
+                lblLogMileage: "Przebieg (opcjonalnie)", lblCost: "Koszt (opcjonalnie)", lblDesc: "Opis / Części / Uwagi"
             },
             en: {
                 appTitle: "Machine Service Logbook", appSub: "Service history, fluid changes, and repair log in one place",
                 btnBg: "Wallpaper", btnPrint: "PDF / Print", btnInstall: "Install", btnImport: "Import", btnExport: "Export", btnAddVehicle: "Add Machine", btnAddLog: "Entry",
-                lblMileage: "Odometer:", lblStatusHeader: "Fluid Status Indicator", btnShowAll: "Show all", lblExpenses: "Service Expenses", lblTotal: "Total :",
+                lblMileage: "Odometer:", lblStatusHeader: "Fluid Status Indicator", btnShowAll: "Show all", lblExpenses: "Service Expenses", lblTotal: "Total:",
                 lblChartTitle: "Expenses Chart", lblTimeline: "Chronological Service History", searchPlaceholder: "Search history...", allYears: "All years", noData: "No data", lblRights: "All rights reserved",
                 modalAddVehicleTitle: "Add New Machine", lblVehicleName: "Name / Model", lblVehicleType: "Vehicle / Equipment Type",
                 optCar: "Car", optBike: "Motorcycle", optGarden: "Lawnmower / Garden Tool", optOther: "Other", btnCancel: "Cancel", btnSave: "Save",
@@ -427,12 +427,12 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                 catFilters: "Filters (Air / Cabin)", catAC: "A/C Service", catRepair: "Repair / Fault", catOther: "Other",
                 chkOilFilter: "Replaced oil filter", chkTensioner: "Replaced tensioner", chkPulleys: "Replaced pulleys", chkWaterPump: "Replaced water pump",
                 chkACDryer: "Replaced A/C receiver dryer", chkACGas: "Refilled A/C refrigerant", chkAirFilter: "Replaced air filter", chkCabinFilter: "Replaced cabin filter",
-                lblLogMileage: "Mileage (optional)", lblCost: "Cost in PLN (optional)", lblDesc: "Description / Parts / Notes"
+                lblLogMileage: "Mileage (optional)", lblCost: "Cost (optional)", lblDesc: "Description / Parts / Notes"
             },
             de: {
                 appTitle: "Maschinen-Serviceheft", appSub: "Wartungshistorie, Flüssigkeitswechsel und Reparaturen an einem Ort",
                 btnBg: "Hintergrund", btnPrint: "PDF / Drucken", btnInstall: "Installieren", btnImport: "Importieren", btnExport: "Exportieren", btnAddVehicle: "Maschine hinzufügen", btnAddLog: "Eintrag",
-                lblMileage: "Kilometerstand:", lblStatusHeader: "Flüssigkeits-Anzeige", btnShowAll: "Alle anzeigen", lblExpenses: "Wartungskosten", lblTotal: "Gesamt :",
+                lblMileage: "Kilometerstand:", lblStatusHeader: "Flüssigkeits-Anzeige", btnShowAll: "Alle anzeigen", lblExpenses: "Wartungskosten", lblTotal: "Gesamt:",
                 lblChartTitle: "Ausgaben-Diagramm", lblTimeline: "Chronologische Servicehistorie", searchPlaceholder: "In der Historie suchen...", allYears: "Alle Jahre", noData: "Keine Daten", lblRights: "Alle Rechte vorbehalten",
                 modalAddVehicleTitle: "Neue Maschine hinzufügen", lblVehicleName: "Name / Modell", lblVehicleType: "Fahrzeug- / Gerätetyp",
                 optCar: "Auto", optBike: "Motorrad", optGarden: "Rasenmäher / Gartengerät", optOther: "Sonstiges", btnCancel: "Abbrechen", btnSave: "Speichern",
@@ -442,12 +442,12 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                 catFilters: "Filter (Luft / Innenraum)", catAC: "Klimaservice", catRepair: "Reparatur / Defekt", catOther: "Sonstiges",
                 chkOilFilter: "Ölfilter gewechselt", chkTensioner: "Spannrolle gewechselt", chkPulleys: "Umlenkrollen gewechselt", chkWaterPump: "Wasserpumpe gewechselt",
                 chkACDryer: "Trockner gewechselt", chkACGas: "Kältemittel aufgefüllt", chkAirFilter: "Luftfilter gewechselt", chkCabinFilter: "Innenraumfilter gewechselt",
-                lblLogMileage: "Kilometerstand (optional)", lblCost: "Kosten in PLN (optional)", lblDesc: "Beschreibung / Teile / Notizen"
+                lblLogMileage: "Kilometerstand (optional)", lblCost: "Kosten (optional)", lblDesc: "Beschreibung / Teile / Notizen"
             },
             zh: {
                 appTitle: "机械服务日志", appSub: "服务记录、液体更换和故障维修集中管理",
                 btnBg: "背景壁纸", btnPrint: "PDF / 打印", btnInstall: "安装应用", btnImport: "导入", btnExport: "导出", btnAddVehicle: "添加机械", btnAddLog: "添加记录",
-                lblMileage: "里程表：", lblStatusHeader: "油液状态提示", btnShowAll: "显示全部", lblExpenses: "维修费用", lblTotal: "总计 ：",
+                lblMileage: "里程表：", lblStatusHeader: "油液状态提示", btnShowAll: "显示全部", lblExpenses: "维修费用", lblTotal: "总计：",
                 lblChartTitle: "开支图表", lblTimeline: "按时间顺序的服务历史", searchPlaceholder: "搜索历史...", allYears: "所有年份", noData: "无数据", lblRights: "保留所有权利",
                 modalAddVehicleTitle: "添加新机械", lblVehicleName: "名称 / 型号", lblVehicleType: "车辆 / 设备类型",
                 optCar: "汽车", optBike: "摩托车", optGarden: "割草机 / 园艺设备", optOther: "其他", btnCancel: "取消", btnSave: "保存",
@@ -457,12 +457,12 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                 catFilters: "滤清器（空气/空调）", catAC: "空调保养", catRepair: "维修 / 故障", catOther: "其他",
                 chkOilFilter: "已更换机滤", chkTensioner: "已更换涨紧轮", chkPulleys: "已更换惰轮", chkWaterPump: "已更换水泵",
                 chkACDryer: "已更换空调干燥罐", chkACGas: "已加注空调雪种", chkAirFilter: "已更换空滤", chkCabinFilter: "已更换空调滤",
-                lblLogMileage: "里程（可选）", lblCost: "费用（PLN，可选）", lblDesc: "说明 / 零部件 / 备注"
+                lblLogMileage: "里程（可选）", lblCost: "费用（可选）", lblDesc: "说明 / 零部件 / 备注"
             },
             ja: {
                 appTitle: "マシン整備記録簿", appSub: "整備履歴、油脂類交換、故障修理を一元管理",
                 btnBg: "壁紙", btnPrint: "PDF / 印刷", btnInstall: "インストール", btnImport: "インポート", btnExport: "エクスポート", btnAddVehicle: "車両を追加", btnAddLog: "記録を追加",
-                lblMileage: "走行量 / 稼働時間：", lblStatusHeader: "油脂類ステータス", btnShowAll: "すべて表示", lblExpenses: "整備費用", lblTotal: "合計 ：",
+                lblMileage: "走行量 / 稼働時間：", lblStatusHeader: "油脂類ステータス", btnShowAll: "すべて表示", lblExpenses: "整備費用", lblTotal: "合計：",
                 lblChartTitle: "支出チャート", lblTimeline: "時系列整備履歴", searchPlaceholder: "履歴を検索...", allYears: "すべての年", noData: "データなし", lblRights: "All rights reserved",
                 modalAddVehicleTitle: "新しい車両・機器を追加", lblVehicleName: "名称 / モデル", lblVehicleType: "タイプ",
                 optCar: "乗用車", optBike: "オートバイ", optGarden: "芝刈り機 / 園芸機器", optOther: "その他", btnCancel: "キャンセル", btnSave: "保存",
@@ -472,12 +472,12 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                 catFilters: "フィルター類（エア/エアコン）", catAC: "エアコン整備", catRepair: "修理 / 故障", catOther: "その他",
                 chkOilFilter: "オイルフィルター交換済", chkTensioner: "テンショナー交換済", chkPulleys: "プーリー交換済", chkWaterPump: "ウォーターポンプ交換済",
                 chkACDryer: "リキッドタンク交換済", chkACGas: "エアコンガス補充済", chkAirFilter: "エアフィルター交換済", chkCabinFilter: "エアコンフィルター交換済",
-                lblLogMileage: "走行距離（任意）", lblCost: "費用 PLN（任意）", lblDesc: "内容 / 使用パーツ / 備考"
+                lblLogMileage: "走行距離（任意）", lblCost: "費用（任意）", lblDesc: "内容 / 使用パーツ / 備考"
             },
             fil: {
                 appTitle: "Serbisyo Talaan ng Makina", appSub: "Kasaysayan ng serbisyo, pagpapalit ng langis at sira sa isang lugar",
                 btnBg: "Wallpaper", btnPrint: "PDF / I-print", btnInstall: "I-install", btnImport: "Angkat", btnExport: "Ilabas", btnAddVehicle: "Magdagdag ng Makina", btnAddLog: "Tala",
-                lblMileage: "Odometer:", lblStatusHeader: "Tagapagpahiwatig ng Langis", btnShowAll: "Ipakita lahat", lblExpenses: "Gastos sa Serbisyo", lblTotal: "Kabuuan :",
+                lblMileage: "Odometer:", lblStatusHeader: "Tagapagpahiwatig ng Langis", btnShowAll: "Ipakita lahat", lblExpenses: "Gastos sa Serbisyo", lblTotal: "Kabuuan:",
                 lblChartTitle: "Talahanayan ng Gastos", lblTimeline: "Kasaysayan ng Serbisyo", searchPlaceholder: "Magsaliksik sa kasaysayan...", allYears: "Lahat ng taon", noData: "Walang datos", lblRights: "Rizervado ang lahat ng karapatan",
                 modalAddVehicleTitle: "Magdagdag ng Bagong Makina", lblVehicleName: "Pangalan / Modelo", lblVehicleType: "Uri ng Sasakyan / Kagamitan",
                 optCar: "Kotse", optBike: "Motorsiklo", optGarden: "Pang-gupit ng Damo / Halaman", optOther: "Iba pa", btnCancel: "Kanselahin", btnSave: "I-save",
@@ -487,12 +487,12 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                 catFilters: "Mga Filter (Hangin / Kabina)", catAC: "Serbisyo sa Aircon", catRepair: "Kumpuni / Sira", catOther: "Iba pa",
                 chkOilFilter: "Pinalitan ang filter ng langis", chkTensioner: "Pinalitan ang tensioner", chkPulleys: "Pinalitan ang ikutan", chkWaterPump: "Pinalitan ang bomba ng tubig",
                 chkACDryer: "Pinalitan ang dryer ng aircon", chkACGas: "Pinalagyan ng freon", chkAirFilter: "Pinalitan ang filter ng hangin", chkCabinFilter: "Pinalitan ang filter sa kabina",
-                lblLogMileage: "Komersyal / Kilometro (psyonal)", lblCost: "Halaga sa PLN (psyonal)", lblDesc: "Paglalarawan / Bahagi / Puna"
+                lblLogMileage: "Komersyal / Kilometro (psyonal)", lblCost: "Halaga (psyonal)", lblDesc: "Paglalarawan / Bahagi / Puna"
             },
             id: {
                 appTitle: "Buku Servis Mesin", appSub: "Riwayat servis, pergantian oli, dan perbaikan dalam satu tempat",
                 btnBg: "Wallpaper", btnPrint: "PDF / Cetak", btnInstall: "Instal", btnImport: "Impor", btnExport: "Ekspor", btnAddVehicle: "Tambah Mesin", btnAddLog: "Catatan",
-                lblMileage: "Odometer:", lblStatusHeader: "Indikator Cairan", btnShowAll: "Tampilkan semua", lblExpenses: "Biaya Servis", lblTotal: "Total :",
+                lblMileage: "Odometer:", lblStatusHeader: "Indikator Cairan", btnShowAll: "Tampilkan semua", lblExpenses: "Biaya Servis", lblTotal: "Total:",
                 lblChartTitle: "Grafik Pengeluaran", lblTimeline: "Riwayat Servis Kronologis", searchPlaceholder: "Cari dalam riwayat...", allYears: "Semua tahun", noData: "Tidak ada data", lblRights: "Hak cipta dilindungi undang-undang",
                 modalAddVehicleTitle: "Tambah Mesin Baru", lblVehicleName: "Nama / Model", lblVehicleType: "Jenis Kendaraan / Peralatan",
                 optCar: "Mobil", optBike: "Sepeda Motor", optGarden: "Mesin Rumput / Alat Kebun", optOther: "Lainnya", btnCancel: "Batal", btnSave: "Simpan",
@@ -502,12 +502,12 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                 catFilters: "Filter (Udara / Kabin)", catAC: "Servis AC", catRepair: "Perbaikan / Kerusakan", catOther: "Lainnya",
                 chkOilFilter: "Filter oli diganti", chkTensioner: "Tensioner diganti", chkPulleys: "Pulley diganti", chkWaterPump: "Pompa air diganti",
                 chkACDryer: "Dryer AC diganti", chkACGas: "Freon AC diisi", chkAirFilter: "Filter udara diganti", chkCabinFilter: "Filter kabin diganti",
-                lblLogMileage: "Kilometer (opsional)", lblCost: "Biaya dalam PLN (opsional)", lblDesc: "Deskripsi / Suku Cadang / Catatan"
+                lblLogMileage: "Kilometer (opsional)", lblCost: "Biaya (opsional)", lblDesc: "Deskripsi / Suku Cadang / Catatan"
             },
             ru: {
                 appTitle: "Сервисная Книжка Техники", appSub: "История обслуживания, замены жидкостей и ремонтов в одном месте",
                 btnBg: "Обои", btnPrint: "PDF / Печать", btnInstall: "Установить", btnImport: "Импорт", btnExport: "Экспорт", btnAddVehicle: "Добавить технику", btnAddLog: "Запись",
-                lblMileage: "Пробег:", lblStatusHeader: "Индикатор Жидкостей", btnShowAll: "Показать все", lblExpenses: "Затраты на ремонт", lblTotal: "Итого :",
+                lblMileage: "Пробег:", lblStatusHeader: "Индикатор Жидкостей", btnShowAll: "Показать все", lblExpenses: "Затраты на ремонт", lblTotal: "Итого:",
                 lblChartTitle: "График Расходов", lblTimeline: "Хронологическая История Обслуживания", searchPlaceholder: "Поиск в истории...", allYears: "Все года", noData: "Нет данных", lblRights: "Все права защищены",
                 modalAddVehicleTitle: "Добавить Новую Технику", lblVehicleName: "Название / Модель", lblVehicleType: "Тип техники / Оборудования",
                 optCar: "Автомобиль", optBike: "Мотоцикл", optGarden: "Газонокосилка / Садовая техника", optOther: "Другое", btnCancel: "Отмена", btnSave: "Сохранить",
@@ -517,70 +517,45 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                 catFilters: "Фильтры (Воздушный / Салонный)", catAC: "Сервис кондиционера", catRepair: "Ремонт / Неисправность", catOther: "Другое",
                 chkOilFilter: "Заменен масляный фильтр", chkTensioner: "Заменен натяжитель", chkPulleys: "Заменены ролики", chkWaterPump: "Заменена водяная помпа",
                 chkACDryer: "Заменен осушитель кондиционера", chkACGas: "Заправлен хладагент AC", chkAirFilter: "Заменен воздушный фильтр", chkCabinFilter: "Заменен салонный фильтр",
-                lblLogMileage: "Пробег (опционально)", lblCost: "Стоимость в PLN (опционально)", lblDesc: "Описание / Запчасти / Заметки"
+                lblLogMileage: "Пробег (опционально)", lblCost: "Стоимость (опционально)", lblDesc: "Описание / Запчасти / Заметки"
             }
         };
 
         let currentLang = localStorage.getItem('garage_lang') || 'pl';
 
-const currencyMap = {
-  pl: 'zł',
-  en: '$',
-  de: '€',
-  zh: '¥',
-  ja: '¥',
-  fil: '₱',
-  id: 'Rp',
-  ru: '₽'
-};
+        const currencyMap = {
+            pl: 'zł',
+            en: '$',
+            de: '€',
+            zh: '¥',
+            ja: '¥',
+            fil: '₱',
+            id: 'Rp',
+            ru: '₽'
+        };
 
-function setLanguage(lang) {
-  currentLang = lang;
-  localStorage.setItem('garage_lang', lang);
+        function setLanguage(lang) {
+            currentLang = lang;
+            localStorage.setItem('garage_lang', lang);
 
-  // 1. Zmiana waluty na podstawie języka
-  if (currencyMap[lang]) {
-    const newCurr = currencyMap[lang];
-    localStorage.setItem('garage_currency', newCurr);
-    
-    // Zmiana wartości w selektorze waluty (jeśli istnieje)
-    const currSelect = document.getElementById('currencySelect');
-    if (currSelect) currSelect.value = newCurr;
-    
-    // Jeśli używasz zmiennej globalnej dla waluty:
-    if (typeof currentCurrency !== 'undefined') {
-      currentCurrency = newCurr;
-    }
-  }
+            // 1. Zmiana waluty na podstawie języka
+            if (currencyMap[lang]) {
+                const newCurr = currencyMap[lang];
+                localStorage.setItem('garage_currency', newCurr);
+            }
 
-  document.getElementById('langSelect').value = lang;
-  
-  // 2. Tłumaczenie i ponowne wyrenderowanie całej aplikacji
-  applyTranslations();
-  render();
+            document.getElementById('langSelect').value = lang;
+            
+            // 2. Tłumaczenie i ponowne wyrenderowanie całej aplikacji
+            applyTranslations();
+            render();
 
-  // 3. Podmiana napisów PLN i zł na właściwy symbol waluty w podsumowaniu
-  const activeCurr = currencyMap[lang] || 'zł';
-  document.querySelectorAll('.currency-symbol, #totalCurrencyLabel').forEach(el => {
-    el.textContent = activeCurr;
-  });
-}
-      currentCurrency = newCurr;
-    }
-  }
-
-  document.getElementById('langSelect').value = lang;
-  
-  // 2. Tłumaczenie i ponowne wyrenderowanie całej aplikacji
-  applyTranslations();
-  render();
-
-  // 3. Podmiana napisów PLN i zł na właściwy symbol waluty w podsumowaniu
-  const activeCurr = currencyMap[lang] || 'zł';
-  document.querySelectorAll('.currency-symbol, #totalCurrencyLabel').forEach(el => {
-    el.textContent = activeCurr;
-  });
-}
+            // 3. Podmiana symboli walut
+            const activeCurr = currencyMap[lang] || 'zł';
+            document.querySelectorAll('.currency-symbol').forEach(el => {
+                el.textContent = activeCurr;
+            });
+        }
 
         function applyTranslations() {
             const langData = i18n[currentLang] || i18n.pl;
@@ -928,12 +903,14 @@ function setLanguage(lang) {
                 return;
             }
 
+            const activeCurr = currencyMap[currentLang] || 'zł';
+
             expensesChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'PLN',
+                        label: activeCurr,
                         data: dataValues,
                         backgroundColor: '#10b981',
                         hoverBackgroundColor: '#f59e0b',
@@ -949,7 +926,7 @@ function setLanguage(lang) {
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return ` Suma: ${context.raw.toLocaleString('pl-PL')} zł`;
+                                    return ` ${context.raw.toLocaleString('pl-PL')} ${activeCurr}`;
                                 }
                             }
                         }
@@ -1086,8 +1063,9 @@ function setLanguage(lang) {
                 });
             }
 
+            const activeCurr = currencyMap[currentLang] || 'zł';
             const totalCost = currentLogs.reduce((sum, log) => sum + (parseFloat(log.cost) || 0), 0);
-            document.getElementById('totalCostDisplay').innerText = totalCost.toLocaleString('pl-PL') + ' zł';
+            document.getElementById('totalCostDisplay').innerHTML = `${totalCost.toLocaleString('pl-PL')} <span class="currency-symbol">${activeCurr}</span>`;
 
             renderChart(currentLogs);
 
@@ -1107,7 +1085,7 @@ function setLanguage(lang) {
                                     <div class="flex items-center gap-2 flex-wrap">
                                         <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">${translatedLogCat}</span>
                                         ${l.mileage ? `<span class="text-xs bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700 font-mono">${l.mileage}</span>` : ''}
-                                        ${logCost > 0 ? `<span class="text-xs bg-emerald-950/90 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800/80 font-mono font-bold"><i class="fa-solid fa-coins text-[10px] mr-1"></i>${logCost.toLocaleString('pl-PL')} zł</span>` : ''}
+                                        ${logCost > 0 ? `<span class="text-xs bg-emerald-950/90 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800/80 font-mono font-bold"><i class="fa-solid fa-coins text-[10px] mr-1"></i>${logCost.toLocaleString('pl-PL')} <span class="currency-symbol">${activeCurr}</span></span>` : ''}
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <span class="text-xs text-slate-400 font-mono">${l.date}</span>
@@ -1301,42 +1279,43 @@ function setLanguage(lang) {
         loadCustomBg();
         render();
     </script>
-<!-- DEDYKOWANY BANER INSTALACJI PWA -->
-<div id="pwaInstallBanner" class="hidden fixed bottom-4 left-4 right-4 bg-amber-500 text-slate-950 p-4 rounded-xl shadow-2xl flex items-center justify-between z-50 border border-amber-400">
-  <div class="flex items-center gap-3">
-    <span class="text-2xl">📲</span>
-    <div>
-      <p class="font-bold text-sm">Zainstaluj Dziennik Serwisowy</p>
-      <p class="text-xs opacity-90">Używaj aplikacji jak natywnej z pulpitu</p>
+
+    <!-- DEDYKOWANY BANER INSTALACJI PWA -->
+    <div id="pwaInstallBanner" class="hidden fixed bottom-4 left-4 right-4 bg-amber-500 text-slate-950 p-4 rounded-xl shadow-2xl flex items-center justify-between z-50 border border-amber-400">
+      <div class="flex items-center gap-3">
+        <span class="text-2xl">📲</span>
+        <div>
+          <p class="font-bold text-sm">Zainstaluj Dziennik Serwisowy</p>
+          <p class="text-xs opacity-90">Używaj aplikacji jak natywnej z pulpitu</p>
+        </div>
+      </div>
+      <button id="pwaInstallBtn" class="bg-slate-950 text-amber-400 font-bold px-4 py-2 rounded-lg text-sm hover:bg-slate-900 transition-all">
+        Install
+      </button>
     </div>
-  </div>
-  <button id="pwaInstallBtn" class="bg-slate-950 text-amber-400 font-bold px-4 py-2 rounded-lg text-sm hover:bg-slate-900 transition-all">
-    Install
-  </button>
-</div>
 
-<script>
-  let deferredPrompt;
-  const pwaBanner = document.getElementById('pwaInstallBanner');
-  const pwaBtn = document.getElementById('pwaInstallBtn');
+    <script>
+      let deferredPrompt;
+      const pwaBanner = document.getElementById('pwaInstallBanner');
+      const pwaBtn = document.getElementById('pwaInstallBtn');
 
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    if (pwaBanner) pwaBanner.classList.remove('hidden');
-  });
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (pwaBanner) pwaBanner.classList.remove('hidden');
+      });
 
-  if (pwaBtn) {
-    pwaBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        if (pwaBanner) pwaBanner.classList.add('hidden');
+      if (pwaBtn) {
+        pwaBtn.addEventListener('click', async () => {
+          if (!deferredPrompt) return;
+          deferredPrompt.prompt();
+          const { outcome } = await deferredPrompt.userChoice;
+          if (outcome === 'accepted') {
+            if (pwaBanner) pwaBanner.classList.add('hidden');
+          }
+          deferredPrompt = null;
+        });
       }
-      deferredPrompt = null;
-    });
-  }
-</script>
+    </script>
 </body>
 </html>
