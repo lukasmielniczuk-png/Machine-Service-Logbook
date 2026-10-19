@@ -125,6 +125,8 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                             <option value="fil">🇵🇭 FIL</option>
                             <option value="id">🇮🇩 ID</option>
                             <option value="ru">🇷🇺 RU</option>
+                            <option value="hi">🇮🇳 HI</option>
+                            <option value="sw">🌍 SW</option>
                         </select>
                     </div>
 
@@ -520,19 +522,51 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                 lblLogMileage: "Пробег (опционально)", lblCost: "Стоимость (опционально)", lblDesc: "Описание / Запчасти / Заметки"
             }
         };
+        hi: {
+                appTitle: "मशीन सेवा पुस्तिका", appSub: "सेवा इतिहास, द्रव परिवर्तन और मरम्मत लॉग एक जगह",
+                btnBg: "बैकग्राउंड", btnPrint: "PDF / प्रिंट", btnInstall: "इंस्टॉल करें", btnImport: "इंपोर्ट", btnExport: "एक्सपोर्ट", btnAddVehicle: "मशीन जोड़ें", btnAddLog: "एंट्री",
+                lblMileage: "ओडोमीटर:", lblStatusHeader: "द्रव स्थिति संकेतक", btnShowAll: "सभी दिखाएं", lblExpenses: "रखरखाव खर्च", lblTotal: "कुल:",
+                lblChartTitle: "व्यय चार्ट", lblTimeline: "सेवा इतिहास", searchPlaceholder: "इतिहास में खोजें...", allYears: "सभी वर्ष", noData: "कोई डेटा नहीं", lblRights: "सर्वाधिकार सुरक्षित",
+                modalAddVehicleTitle: "नई मशीन जोड़ें", lblVehicleName: "नाम / मॉडल", lblVehicleType: "प्रकार",
+                optCar: "कार", optBike: "मोटरसाइकिल", optGarden: "घास काटने की मशीन", optOther: "अन्य", btnCancel: "रद्द करें", btnSave: "सहेजें",
+                modalAddLogTitle: "प्रविष्टि जोड़ें", lblDate: "तिथि", lblCategory: "श्रेणी",
+                catEngineOil: "इंजन ऑयल", catGearboxOil: "गियरबॉक्स ऑयल", catTimingBelt: "टाइming बेल्ट", catAuxBelt: "सहायक बेल्ट",
+                catBrakeFluid: "ब्रेक फ्लूड", catCoolant: "कूलेंट", catPowerSteering: "पावर स्टीयरिंग फ्लूड", catSparkPlugs: "स्पार्क प्लग",
+                catFilters: "फिल्टर", catAC: "एसी सेवा", catRepair: "मरम्मत", catOther: "अन्य",
+                chkOilFilter: "ऑयल फ़िल्टर बदला गया", chkTensioner: "टेंशनर बदला गया", chkPulleys: "पुली बदली गई", chkWaterPump: "वाटर पंप बदला गया",
+                chkACDryer: "ड्रायर बदला गया", chkACGas: "गैस भरी गई", chkAirFilter: "एयर फ़िल्टर बदला गया", chkCabinFilter: "कैबिन फ़िल्टर बदला गया",
+                lblLogMileage: "माइलेज (वैकल्पिक)", lblCost: "लागत (वैकल्पिक)", lblDesc: "विवरण / विवरण"
+            },
+            sw: {
+                appTitle: "Kitabu cha Huduma cha Mashine", appSub: "Kumbukumbu za matengenezo na mafuta sehemu moja",
+                btnBg: "Picha ya Chini", btnPrint: "PDF / Chapisha", btnInstall: "Sakinisha", btnImport: "Ingiza", btnExport: "Toa", btnAddVehicle: "Ongeza Mashine", btnAddLog: "Kumbukumbu",
+                lblMileage: "Odometer:", lblStatusHeader: "Hali ya Mafuta", btnShowAll: "Onyesha yote", lblExpenses: "Gharama za Huduma", lblTotal: "Jumla:",
+                lblChartTitle: "Chati ya Gharama", lblTimeline: "Historia ya Huduma", searchPlaceholder: "Tafuta kwenye historia...", allYears: "Miaka yote", noData: "Hakuna data", lblRights: "Haki zote zimehifadhiwa",
+                modalAddVehicleTitle: "Ongeza Mashine Mpya", lblVehicleName: "Jina / Model", lblVehicleType: "Aina ya Chombo",
+                optCar: "Gari", optBike: "Pikipiki", optGarden: "Mashine ya Nyasi", optOther: "Nyengine", btnCancel: "Ghairi", btnSave: "Hifadhi",
+                modalAddLogTitle: "Ongeza Kumbukumbu", lblDate: "Tarehe", lblCategory: "Kipengele",
+                catEngineOil: "Mafuta ya Injini", catGearboxOil: "Mafuta ya Giriboksi", catTimingBelt: "Kamba ya Timing", catAuxBelt: "Kamba ya Feni",
+                catBrakeFluid: "Mafuta ya Breki", catCoolant: "Maji ya Redieta", catPowerSteering: "Mafuta ya Steringi", catSparkPlugs: "Pasi za Moto",
+                catFilters: "Chujio (Hewa / Ndani)", catAC: "Huduma ya AC", catRepair: "Ukarabati / Hitilafu", catOther: "Nyengine",
+                chkOilFilter: "Chujio la mafuta limebadilishwa", chkTensioner: "Tensioner imebadilishwa", chkPulleys: "Pulleys zimebadilishwa", chkWaterPump: "Pampu ya maji imebadilishwa",
+                chkACDryer: "Dryer ya AC imebadilishwa", chkACGas: "Gas ya AC imejazwa", chkAirFilter: "Chujio la hewa limebadilishwa", chkCabinFilter: "Chujio la ndani limebadilishwa",
+                lblLogMileage: "Kilomita (hiari)", lblCost: "Gharama (hiari)", lblDesc: "Maelezo / Vipuri / Vidokezo"
+            }
 
         let currentLang = localStorage.getItem('garage_lang') || 'pl';
 
-        const currencyMap = {
-            pl: 'zł',
-            en: '$',
-            de: '€',
-            zh: '¥',
-            ja: '¥',
-            fil: '₱',
-            id: 'Rp',
-            ru: '₽'
-        };
+       const currencyMap = {
+  pl: 'zł',
+  en: '$',
+  de: '€',
+  zh: '¥',
+  ja: '¥',
+  fil: '₱',
+  id: 'Rp',
+  ru: '₽',
+  hi: '₹',   // Rupia indyjska
+  sw: 'KSh'  // Szyling (Suahili)
+};
 
         function setLanguage(lang) {
             currentLang = lang;
