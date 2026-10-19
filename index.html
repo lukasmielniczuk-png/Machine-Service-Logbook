@@ -7,10 +7,11 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
 =====================================================================
 -->
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" translate="no">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
     <title>Garażowy Dziennik Serwisowy</title>
     
     <!-- PWA / KONFIGURACJA DLA SMARTFONA -->
@@ -113,7 +114,7 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                     <p class="text-slate-400 text-sm mt-1" data-i18n="appSub">Historia serwisu, wymian płynów i usterek w jednym miejscu</p>
                 </div>
                 <div class="flex gap-2 flex-wrap justify-end items-center">
-                    <!-- SELEKTOR JĘZYKA (8 JĘZYKÓW) -->
+                    <!-- SELEKTOR JĘZYKA (10 JĘZYKÓW) -->
                     <div class="flex items-center bg-slate-800 rounded-lg border border-slate-700 px-2.5 py-1 gap-1.5 text-xs">
                         <i class="fa-solid fa-globe text-amber-400"></i>
                         <select id="langSelect" onchange="setLanguage(this.value)" class="bg-slate-800 text-amber-400 font-bold focus:outline-none cursor-pointer">
@@ -399,7 +400,7 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
     </div>
 
     <script>
-        // SŁOWNIK WIELOJĘZYCZNY (8 JĘZYKÓW)
+        // SŁOWNIK WIELOJĘZYCZNY (10 JĘZYKÓW)
         const i18n = {
             pl: {
                 appTitle: "Dziennik Serwisowy Maszyn", appSub: "Historia serwisu, wymian płynów i usterek w jednym miejscu",
@@ -520,9 +521,8 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                 chkOilFilter: "Заменен масляный фильтр", chkTensioner: "Заменен натяжитель", chkPulleys: "Заменены ролики", chkWaterPump: "Заменена водяная помпа",
                 chkACDryer: "Заменен осушитель кондиционера", chkACGas: "Заправлен хладагент AC", chkAirFilter: "Заменен воздушный фильтр", chkCabinFilter: "Заменен салонный фильтр",
                 lblLogMileage: "Пробег (опционально)", lblCost: "Стоимость (опционально)", lblDesc: "Описание / Запчасти / Заметки"
-            }
-        };
-        hi: {
+            },
+            hi: {
                 appTitle: "मशीन सेवा पुस्तिका", appSub: "सेवा इतिहास, द्रव परिवर्तन और मरम्मत लॉग एक जगह",
                 btnBg: "बैकग्राउंड", btnPrint: "PDF / प्रिंट", btnInstall: "इंस्टॉल करें", btnImport: "इंपोर्ट", btnExport: "एक्सपोर्ट", btnAddVehicle: "मशीन जोड़ें", btnAddLog: "एंट्री",
                 lblMileage: "ओडोमीटर:", lblStatusHeader: "द्रव स्थिति संकेतक", btnShowAll: "सभी दिखाएं", lblExpenses: "रखरखाव खर्च", lblTotal: "कुल:",
@@ -552,27 +552,27 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
                 chkACDryer: "Dryer ya AC imebadilishwa", chkACGas: "Gas ya AC imejazwa", chkAirFilter: "Chujio la hewa limebadilishwa", chkCabinFilter: "Chujio la ndani limebadilishwa",
                 lblLogMileage: "Kilomita (hiari)", lblCost: "Gharama (hiari)", lblDesc: "Maelezo / Vipuri / Vidokezo"
             }
+        };
 
         let currentLang = localStorage.getItem('garage_lang') || 'pl';
 
-       const currencyMap = {
-  pl: 'zł',
-  en: '$',
-  de: '€',
-  zh: '¥',
-  ja: '¥',
-  fil: '₱',
-  id: 'Rp',
-  ru: '₽',
-  hi: '₹',   // Rupia indyjska
-  sw: 'KSh'  // Szyling (Suahili)
-};
+        const currencyMap = {
+            pl: 'zł',
+            en: '$',
+            de: '€',
+            zh: '¥',
+            ja: '¥',
+            fil: '₱',
+            id: 'Rp',
+            ru: '₽',
+            hi: '₹',
+            sw: 'KSh'
+        };
 
         function setLanguage(lang) {
             currentLang = lang;
             localStorage.setItem('garage_lang', lang);
 
-            // 1. Zmiana waluty na podstawie języka
             if (currencyMap[lang]) {
                 const newCurr = currencyMap[lang];
                 localStorage.setItem('garage_currency', newCurr);
@@ -580,11 +580,9 @@ Wszelkie prawa zastrzeżone / All rights reserved (c) 2026 L. Mielniczuk
 
             document.getElementById('langSelect').value = lang;
             
-            // 2. Tłumaczenie i ponowne wyrenderowanie całej aplikacji
             applyTranslations();
             render();
 
-            // 3. Podmiana symboli walut
             const activeCurr = currencyMap[lang] || 'zł';
             document.querySelectorAll('.currency-symbol').forEach(el => {
                 el.textContent = activeCurr;
