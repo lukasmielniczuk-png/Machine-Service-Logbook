@@ -538,16 +538,32 @@ function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('garage_lang', lang);
 
-  // Automatyczna zmiana waluty przypisanej do języka
+  // 1. Zmiana waluty na podstawie języka
   if (currencyMap[lang]) {
-    localStorage.setItem('garage_currency', currencyMap[lang]);
+    const newCurr = currencyMap[lang];
+    localStorage.setItem('garage_currency', newCurr);
+    
+    // Zmiana wartości w selektorze waluty (jeśli istnieje)
     const currSelect = document.getElementById('currencySelect');
-    if (currSelect) currSelect.value = currencyMap[lang];
+    if (currSelect) currSelect.value = newCurr;
+    
+    // Jeśli używasz zmiennej globalnej dla waluty:
+    if (typeof currentCurrency !== 'undefined') {
+      currentCurrency = newCurr;
+    }
   }
 
   document.getElementById('langSelect').value = lang;
+  
+  // 2. Tłumaczenie i ponowne wyrenderowanie całej aplikacji
   applyTranslations();
   render();
+
+  // 3. Podmiana napisów PLN i zł na właściwy symbol waluty w podsumowaniu
+  const activeCurr = currencyMap[lang] || 'zł';
+  document.querySelectorAll('.currency-symbol, #totalCurrencyLabel').forEach(el => {
+    el.textContent = activeCurr;
+  });
 }
 
         function applyTranslations() {
